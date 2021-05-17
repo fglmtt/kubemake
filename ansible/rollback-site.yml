@@ -4,4 +4,5 @@
   tags:
   - setup
   roles:
+  - rollback/k8s/common
   - rollback/common
