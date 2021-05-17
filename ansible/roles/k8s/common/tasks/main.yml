@@ -4,7 +4,7 @@
 
 - name: Ensure br_netfilter module is loaded
   copy:
-    src: br_netfilter.conf
+    src: modules-load.conf
     dest: /etc/modules-load.d/k8s.conf
     owner: root
     group: root
