@@ -1,4 +1,7 @@
 ---
+- name: Disable swap
+  shell: swapoff -a
+
 - name: Ensure br_netfilter module is loaded
   copy:
     src: br_netfilter.conf
