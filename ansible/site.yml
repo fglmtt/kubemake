@@ -5,4 +5,5 @@
   - setup
   roles:
   - common
+  - crio
   - k8s/common

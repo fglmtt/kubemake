@@ -1,0 +1,44 @@
+---
+- name: Uninstall cri-o and cri-o-runc
+  apt:
+    name: "{{ packages }}"
+    state: absent
+  vars:
+    packages:
+    - cri-o
+    - cri-o-runc
+
+- name: Remove libcontainers-cri-o apt repository
+  apt_repository:
+    repo: deb http://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/{{ crio_version }}/{{ crio_os }}/ /
+    filename: devel:kubic:libcontainers:stable:cri-o:{{ crio_version }}
+    state: absent
+
+- name: Remove libcontainers apt repository
+  apt_repository:
+    repo: deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/{{ crio_os }}/ /
+    filename: devel:kubic:libcontainers:stable
+    state: absent
+
+- name: Delete libcontainers-cri-o public signing key
+  file:
+    path: /etc/apt/trusted.gpg.d/libcontainers-cri-o.gpg
+    state: absent
+
+- name: Delete libcontainers public signing key
+  file:
+    path: /etc/apt/trusted.gpg.d/libcontainers.gpg
+    state: absent
+
+- name: Delete /etc/sysctl.d/99-kubernetes-cri.conf
+  file:
+    path: /etc/sysctl.d/99-kubernetes-cri.conf
+    state: absent
+
+- name: Delete /etc/modules-load.d/crio.conf
+  file:
+    path: /etc/modules-load.d/crio.conf
+    state: absent
+
+- name: Force sysctl to load settings from all system conf files
+  shell: sysctl --system

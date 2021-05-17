@@ -1,0 +1,55 @@
+---
+- name: Ensure br_netfilter and overlay modules are loaded
+  copy:
+    src: modules-load.conf
+    dest: /etc/modules-load.d/crio.conf
+    owner: root
+    group: root
+
+- name: Ensure iptables works properly
+  copy:
+    src: iptables.conf
+    dest: /etc/sysctl.d/99-kubernetes-cri.conf
+    owner: root
+    group: root
+
+- name: Force sysctl to load settings from all system conf files
+  shell: sysctl --system
+
+- name: Download libcontainers public signing key
+  apt_key:
+    url: https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/{{crio_os}}/Release.key
+    keyring: /etc/apt/trusted.gpg.d/libcontainers.gpg
+
+- name: Download libcontainers-cri-o public signing key
+  apt_key:
+    url: https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable:cri-o:{{ crio_version }}/{{ crio_os }}/Release.key
+    keyring: /etc/apt/trusted.gpg.d/libcontainers-cri-o.gpg
+
+- name: Add libcontainers apt repository
+  apt_repository:
+    repo: deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/{{ crio_os }}/ /
+    filename: devel:kubic:libcontainers:stable
+    state: present
+
+- name: Add libcontainers-cri-o apt repository
+  apt_repository:
+    repo: deb http://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/{{ crio_version }}/{{ crio_os }}/ /
+    filename: devel:kubic:libcontainers:stable:cri-o:{{ crio_version }}
+    state: present
+
+- name: Install cri-o and cri-o-runc
+  apt:
+    name: "{{ packages }}"
+    state: present
+    update_cache: yes
+  vars:
+    packages:
+    - cri-o
+    - cri-o-runc
+
+- name: Daemon reload
+  shell: systemctl daemon-reload
+
+- name: Enable cri-o
+  shell: systemctl enable crio --now
