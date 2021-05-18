@@ -1,4 +1,11 @@
 ---
+- hosts: masters
+  become: yes
+  tags:
+  - init
+  roles:
+  - rollback/k8s/init
+
 - hosts: all
   become: yes
   tags:

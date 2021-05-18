@@ -1,0 +1,16 @@
+---
+- name: Reset the control plane node
+  shell: kubeadm reset --force
+
+- name: Reset iptables
+  shell: |
+    iptables -F
+    iptables -t nat -F
+    iptables -t mangle -F
+    iptables -X
+
+- name: Delete ~/.kube/directory
+  become: no
+  file:
+    path: $HOME/.kube
+    state: absent

@@ -1,0 +1,30 @@
+---
+- name: Populate service facts
+  service_facts:
+
+- name: Ensure kubelet is not running
+  service_facts:
+  until:
+  - ansible_facts['services']['kubelet.service']['state'] != 'running'
+  retries: 2
+  delay: 5
+  failed_when: false
+
+- name: Initialize the K8s cluster
+  shell: kubeadm init --pod-network-cidr={{ pod_network_cidr }}
+  when:
+  - ansible_facts['services']['kubelet.service']['state'] != 'running'
+
+- name: Create ~/.kube diectory
+  become: no
+  file:
+    path: $HOME/.kube
+    state: directory
+
+- name: Copy K8s config file in ~/.kube
+  copy:
+    src: /etc/kubernetes/admin.conf
+    remote_src: yes
+    dest: /home/{{ ansible_user }}/.kube/config
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"

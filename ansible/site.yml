@@ -7,3 +7,10 @@
   - common
   - crio
   - k8s/common
+
+- hosts: masters
+  become: yes
+  tags:
+  - init
+  roles:
+  - k8s/init
