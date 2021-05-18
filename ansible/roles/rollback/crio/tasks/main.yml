@@ -40,5 +40,11 @@
     path: /etc/modules-load.d/crio.conf
     state: absent
 
+- name: Unload br_netfilter module
+  shell: modprobe -r br_netfilter
+
+- name: Unload overlay module
+  shell: modprobe -r overlay
+
 - name: Force sysctl to load settings from all system conf files
   shell: sysctl --system

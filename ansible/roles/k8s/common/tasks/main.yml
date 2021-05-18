@@ -2,12 +2,15 @@
 - name: Disable swap
   shell: swapoff -a
 
-- name: Ensure br_netfilter module is loaded
+- name: Add k8s configiguration file to /etc/modules-load.d/
   copy:
     src: modules-load.conf
     dest: /etc/modules-load.d/k8s.conf
     owner: root
     group: root
+
+- name: Ensure br_netfilter module is loaded
+  shell: modprobe br_netfilter
 
 - name: Ensure iptables corretly see bridged traffic
   copy:

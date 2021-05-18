@@ -22,6 +22,9 @@
     path: /usr/share/keyrings/kubernetes-archive-keyring.gpg
     state: absent
 
+- name: Unload br_netfilter module
+  shell: modprobe -r br_netfilter
+
 - name: Delete /etc/modules-load.d/k8s.conf
   file:
     path: /etc/modules-load.d/k8s.conf

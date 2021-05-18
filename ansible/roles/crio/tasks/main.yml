@@ -1,10 +1,16 @@
 ---
-- name: Ensure br_netfilter and overlay modules are loaded
+- name: Add crio configuration file to /etc/modules-load.d/
   copy:
     src: modules-load.conf
     dest: /etc/modules-load.d/crio.conf
     owner: root
     group: root
+
+- name: Ensure br_netfilter module is loaded
+  shell: modprobe br_netfilter
+
+- name: Ensure overlay module is loaded
+  shell: modprobe overlay
 
 - name: Ensure iptables works properly
   copy:
