@@ -2,7 +2,7 @@
 - name: Create join command
   shell: kubeadm token create --print-join-command
   register: join_cmd
-  delgate_to: "{{ groups['masters'][0] }}"
+  delegate_to: "{{ groups['masters'][0] }}"
 
 - name: Ensure node has not joined yet
   become: no
@@ -10,7 +10,7 @@
     kind: Node
     name: "{{ hostvars[inventory_hostname]['ansible_hostname'] }}"
   register: k8s_node
-  delgate_to: "{{ groups['masters'][0] }}"
+  delegate_to: "{{ groups['masters'][0] }}"
 
 - name: Join cluster
   block:
@@ -25,7 +25,7 @@
       kind: Node
       name: "{{ ansible_hostname }}"
     register: k8s_node
-    delgate_to: "{{ groups['masters'][0] }}"
+    delegate_to: "{{ groups['masters'][0] }}"
     until:
     - k8s_node.resources != []
     retries: 60
@@ -40,5 +40,5 @@
       wait_timeout: 300
       wait_condition:
         status: "True"
-	type: "Ready"
-    delgate_to: "{{ groups['masters'][0] }}"
+        type: "Ready"
+    delegate_to: "{{ groups['masters'][0] }}"

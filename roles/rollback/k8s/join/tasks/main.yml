@@ -6,7 +6,7 @@
     --delete-local-data
     --force
     --ignore-daemonsets
-  delgate_to: "{{ groups['masters'][0] }}"
+  delegate_to: "{{ groups['masters'][0] }}"
 
 - name: Reset node
   shell: kubeadm reset --force
@@ -24,17 +24,7 @@
     kind: Node
     name: "{{ hostvars[inventory_hostname]['ansible_hostname'] }}" 
     state: absent
-  delgate_to: "{{ groups['masters'][0] }}"
-
-- name: Delete /etc/cni/net.d directory
-  file:
-    path: /etc/cni/net.d
-    state: absent
-
-- name: Delete /var/lib/cni directory
-  file:
-    path: /var/lib/cni
-    state: absent
+  delegate_to: "{{ groups['masters'][0] }}"
 
 - name: Delete flannel.1 interface
   shell: ip link delete flannel.1

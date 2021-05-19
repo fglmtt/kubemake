@@ -11,16 +11,6 @@
     path: $HOME/flannel.yml
     state: absent
 
-- name: Delete /etc/cni/net.d directory
-  file:
-    path: /etc/cni/net.d
-    state: absent
-
-- name: Delete /var/lib/cni directory
-  file:
-    path: /var/lib/cni
-    state: absent
-
 - name: Delete flannel.1 interface
   shell: ip link delete flannel.1
   register: del_flannel
