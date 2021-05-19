@@ -1,0 +1,55 @@
+---
+- name: Drain node
+  become: no
+  shell: >
+    kubectl drain {{ hostvars[inventory_hostname]['ansible_hostname'] }}
+    --delete-local-data
+    --force
+    --ignore-daemonsets
+  delgate_to: "{{ groups['masters'][0] }}"
+
+- name: Reset node
+  shell: kubeadm reset --force
+
+- name: Reset iptables
+  shell: |
+    iptables -F
+    iptables -t nat -F
+    iptables -t mangle -F
+    iptables -X
+
+- name: Delete node
+  become: no
+  community.kubernetes.k8s:
+    kind: Node
+    name: "{{ hostvars[inventory_hostname]['ansible_hostname'] }}" 
+    state: absent
+  delgate_to: "{{ groups['masters'][0] }}"
+
+- name: Delete /etc/cni/net.d directory
+  file:
+    path: /etc/cni/net.d
+    state: absent
+
+- name: Delete /var/lib/cni directory
+  file:
+    path: /var/lib/cni
+    state: absent
+
+- name: Delete flannel.1 interface
+  shell: ip link delete flannel.1
+  register: del_flannel
+  failed_when:
+  - del_flannel.rc != 0
+  - "'Cannot find device \"flannel.1\"' not in del_flannel.stderr"
+  changed_when:
+  - del_flannel.rc == 0
+
+- name: Delete cni0 bridge
+  shell: ip link delete cni0 type bridge
+  register: del_cni
+  failed_when:
+  - del_cni.rc != 0
+  - "'Cannot find device \"cni0\"' not in del_cni.stderr"
+  changed_when:
+  - del_cni.rc == 0

@@ -1,0 +1,44 @@
+---
+- name: Create join command
+  shell: kubeadm token create --print-join-command
+  register: join_cmd
+  delgate_to: "{{ groups['masters'][0] }}"
+
+- name: Ensure node has not joined yet
+  become: no
+  community.kubernetes.k8s_info:
+    kind: Node
+    name: "{{ hostvars[inventory_hostname]['ansible_hostname'] }}"
+  register: k8s_node
+  delgate_to: "{{ groups['masters'][0] }}"
+
+- name: Join cluster
+  block:
+  - name: Run join command
+    shell: "{{ join_cmd.stdout_lines[0] }}"
+    when:
+    - k8s_node.resources == []
+
+  - name: Check if node joined
+    become: no
+    community.kubernetes.k8s_info:
+      kind: Node
+      name: "{{ ansible_hostname }}"
+    register: k8s_node
+    delgate_to: "{{ groups['masters'][0] }}"
+    until:
+    - k8s_node.resources != []
+    retries: 60
+    delay: 5
+
+  - name: Check if status node is ready
+    become: no
+    community.kubernetes.k8s_info:
+      kind: Node
+      name: "{{ ansible_hostname }}"
+      wait: yes
+      wait_timeout: 300
+      wait_condition:
+        status: "True"
+	type: "Ready"
+    delgate_to: "{{ groups['masters'][0] }}"

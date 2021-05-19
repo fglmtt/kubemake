@@ -15,3 +15,10 @@
   roles:
   - k8s/init
   - flannel
+
+- hosts: workers
+  become: yes
+  tags:
+  - join
+  roles:
+  - k8s/join

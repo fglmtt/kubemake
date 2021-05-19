@@ -1,4 +1,11 @@
 ---
+- hosts: workers
+  become: yes
+  tags:
+  - join
+  roles:
+  - rollback/k8s/join
+
 - hosts: masters
   become: yes
   tags:
