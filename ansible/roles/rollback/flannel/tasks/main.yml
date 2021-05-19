@@ -1,0 +1,40 @@
+---
+- name: Delete flannel
+  become: no
+  community.kubernetes.k8s:
+    src: $HOME/flannel.yml
+    state: absent
+
+- name: Delete flannel manifest
+  become: no
+  file:
+    path: $HOME/flannel.yml
+    state: absent
+
+- name: Delete /etc/cni/net.d directory
+  file:
+    path: /etc/cni/net.d
+    state: absent
+
+- name: Delete /var/lib/cni directory
+  file:
+    path: /var/lib/cni
+    state: absent
+
+- name: Delete flannel.1 interface
+  shell: ip link delete flannel.1
+  register: del_flannel
+  failed_when:
+  - del_flannel.rc != 0
+  - "'Cannot find device \"flannel.1\"' not in del_flannel.stderr"
+  changed_when:
+  - del_flannel.rc == 0
+
+- name: Delete cni0 bridge
+  shell: ip link delete cni0 type bridge
+  register: del_cni
+  failed_when:
+  - del_cni.rc != 0
+  - "'Cannot find device \"cni0\"' not in del_cni.stderr"
+  changed_when:
+  - del_cni.rc == 0

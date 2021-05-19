@@ -4,6 +4,7 @@
   tags:
   - init
   roles:
+  - rollback/flannel
   - rollback/k8s/init
 
 - hosts: all

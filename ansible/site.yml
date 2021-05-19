@@ -14,3 +14,4 @@
   - init
   roles:
   - k8s/init
+  - flannel

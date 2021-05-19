@@ -1,0 +1,12 @@
+---
+- name: Download flannel manifest
+  become: no
+  get_url:
+    url: https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+    dest: $HOME/flannel.yml
+
+- name: Deploy flannel to the cluster
+  become: no
+  community.kubernetes.k8s:
+    src: $HOME/flannel.yml
+    state: present
