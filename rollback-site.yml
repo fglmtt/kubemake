@@ -1,4 +1,11 @@
 ---
+- hosts: masters
+  become: no
+  tags:
+  - mesh
+  roles:
+  - rollback/istio
+
 - hosts: workers
   become: yes
   tags:

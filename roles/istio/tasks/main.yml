@@ -1,0 +1,41 @@
+---
+- name: Get script to download istio
+  get_url:
+    url: https://istio.io/downloadIstio
+    dest: $HOME/downloadIstio.sh
+
+- name: Make the script executable
+  file:
+    path: $HOME/downloadIstio.sh
+    mode: u+x
+
+- name: Download istio {{ istio_version }}
+  shell: >
+    ISTIO_VERSION={{ istio_version }}
+    sh $HOME/downloadIstio.sh
+
+- name: Delete the script
+  file:
+    path: $HOME/downloadIstio.sh
+    state: absent
+
+- name: Create symlink
+  become: yes
+  file:
+    src: /home/{{ ansible_user }}/istio-{{ istio_version }}/bin/istioctl
+    dest: /usr/local/bin/istioctl
+    state: link
+
+- name: Install {{ istio_profile }} profile
+  shell: >
+    istioctl install 
+    --set profile={{ istio_profile }}
+    --skip-confirmation
+
+- name: Generate manifest
+  shell: >
+    istioctl manifest generate --set profile={{ istio_profile }}
+    > $HOME/istio.yml
+
+- name: Verify installation
+  shell: istioctl verify-install -f $HOME/istio.yml

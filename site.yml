@@ -22,3 +22,10 @@
   - join
   roles:
   - k8s/join
+
+- hosts: masters
+  become: no
+  tags:
+  - mesh
+  roles:
+  - istio

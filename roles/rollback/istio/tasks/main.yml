@@ -1,0 +1,25 @@
+---
+- name: Uninstall istio
+  shell: istioctl x uninstall --purge --skip-confirmation
+
+- name: Delete istio-system namespace
+  community.kubernetes.k8s:
+    kind: Namespace
+    name: istio-system
+    state: absent
+
+- name: Delete symlink
+  become: yes
+  file:
+    path: /usr/local/bin/istioctl
+    state: absent
+
+- name: Delete manifest
+  file:
+    path: $HOME/istio.yml
+    state: absent
+
+- name: Delete istio
+  file:
+    path: $HOME/istio-{{ istio_version }}
+    state: absent

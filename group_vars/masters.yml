@@ -1,2 +1,5 @@
 ---
 pod_network_cidr: 10.244.0.0/16
+
+istio_version: "1.10.0"
+istio_profile: demo
