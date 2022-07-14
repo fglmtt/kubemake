@@ -6,7 +6,7 @@
 
 - name: Ensure node has not joined yet
   become: no
-  community.kubernetes.k8s_info:
+  kubernetes.core.k8s_info:
     kind: Node
     name: "{{ hostvars[inventory_hostname]['ansible_hostname'] }}"
   register: k8s_node
@@ -21,7 +21,7 @@
 
   - name: Check if node joined
     become: no
-    community.kubernetes.k8s_info:
+    kubernetes.core.k8s_info:
       kind: Node
       name: "{{ ansible_hostname }}"
     register: k8s_node
@@ -33,7 +33,7 @@
 
   - name: Check if status node is ready
     become: no
-    community.kubernetes.k8s_info:
+    kubernetes.core.k8s_info:
       kind: Node
       name: "{{ ansible_hostname }}"
       wait: yes

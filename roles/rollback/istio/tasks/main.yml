@@ -3,7 +3,7 @@
   shell: istioctl x uninstall --purge --skip-confirmation
 
 - name: Delete istio-system namespace
-  community.kubernetes.k8s:
+  kubernetes.core.k8s:
     kind: Namespace
     name: istio-system
     state: absent

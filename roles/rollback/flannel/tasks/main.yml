@@ -1,7 +1,7 @@
 ---
 - name: Delete flannel
   become: no
-  community.kubernetes.k8s:
+  kubernetes.core.k8s:
     src: $HOME/flannel.yml
     state: absent
 
