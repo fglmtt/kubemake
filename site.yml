@@ -29,3 +29,10 @@
   - mesh
   roles:
   - istio
+
+- hosts: masters
+  become: no
+  tags:
+  - telemetry
+  roles:
+  - istio/addons

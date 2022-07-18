@@ -2,6 +2,13 @@
 - hosts: masters
   become: no
   tags:
+  - telemetry
+  roles:
+  - rollback/istio/addons
+
+- hosts: masters
+  become: no
+  tags:
   - mesh
   roles:
   - rollback/istio

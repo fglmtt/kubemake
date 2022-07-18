@@ -1,0 +1,32 @@
+---
+# kiali installation might fail for some istio versions
+# if so, look here https://github.com/istio/istio/issues/27577
+- name: Deploy telemetry addons to the cluster
+  kubernetes.core.k8s:
+    src: $HOME/istio-{{ istio_version }}/samples/addons/{{ item }}.yaml
+    state: present
+  loop:
+  - grafana
+  - jaeger
+  - kiali
+  - prometheus
+
+- name: Render templates to access addons remotely
+  template:
+    src: "{{ item }}.j2"
+    dest: $HOME/{{ item }}.yaml
+  loop:
+  - grafana
+  - jaeger
+  - kiali
+  - prometheus
+
+- name: Deploy gateways and virtual services to access addons remotely
+  kubernetes.core.k8s:
+    src: $HOME/{{ item }}.yaml
+    state: present
+  loop:
+  - grafana
+  - jaeger
+  - kiali
+  - prometheus
