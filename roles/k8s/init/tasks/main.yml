@@ -24,7 +24,10 @@
   failed_when: false
 
 - name: Initialize the K8s cluster
-  shell: kubeadm init --pod-network-cidr={{ pod_network_cidr }}
+  shell: >
+    kubeadm init 
+    --apiserver-advertise-address={{ apiserver_advertise_address }} 
+    --pod-network-cidr={{ pod_network_cidr }}
   when:
   - ansible_facts['services']['kubelet.service']['state'] != 'running'
 
@@ -41,3 +44,15 @@
     dest: /home/{{ ansible_user }}/.kube/config
     owner: "{{ ansible_user }}"
     group: "{{ ansible_user }}"
+
+- name: Set --node-ip for kubelet
+  lineinfile:
+    path: /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+    regexp: '^Environment="KUBELET_CONFIG_ARGS=--config=/var/lib/kubelet/config.yaml"'
+    line: 'Environment="KUBELET_CONFIG_ARGS=--config=/var/lib/kubelet/config.yaml --node-ip={{ kubelet_node_ip }}"'
+
+- name: Restart service kubelet
+  systemd:
+    daemon_reload: yes
+    name: kubelet
+    state: restarted

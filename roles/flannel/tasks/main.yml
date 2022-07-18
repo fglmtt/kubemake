@@ -5,6 +5,13 @@
     url: https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
     dest: $HOME/flannel.yml
 
+- name: Set interfaces flannel should look at
+  become: no
+  lineinfile:
+    path: $HOME/flannel.yml
+    insertafter: '        - --kube-subnet-mgr'
+    line: '        - --iface-regex={{ flannel_iface_regex }}'
+
 - name: Deploy flannel to the cluster
   become: no
   kubernetes.core.k8s:

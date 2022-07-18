@@ -42,3 +42,15 @@
         status: "True"
         type: "Ready"
     delegate_to: "{{ groups['masters'][0] }}"
+
+- name: Set --node-ip for kubelet
+  lineinfile:
+    path: /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+    regexp: '^Environment="KUBELET_CONFIG_ARGS=--config=/var/lib/kubelet/config.yaml"'
+    line: 'Environment="KUBELET_CONFIG_ARGS=--config=/var/lib/kubelet/config.yaml --node-ip={{ kubelet_node_ip }}"'
+
+- name: Restart service kubelet
+  systemd:
+    daemon_reload: yes
+    name: kubelet
+    state: restarted
