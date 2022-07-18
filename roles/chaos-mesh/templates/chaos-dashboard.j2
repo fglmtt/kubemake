@@ -1,0 +1,43 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: chaos-dashboard-gateway
+  namespace: chaos-testing
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+  - port:
+      number: 80
+      name: http-chaos-dashboard
+      protocol: HTTP
+    hosts:
+    - "chaos.{{ istio_ingress_domain }}"
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: chaos-dashboard-vs
+  namespace: chaos-testing
+spec:
+  hosts:
+  - "chaos.{{ istio_ingress_domain }}"
+  gateways:
+  - chaos-dashboard-gateway
+  http:
+  - route:
+    - destination:
+        host: chaos-dashboard
+        port:
+          number: 2333
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: chaos-dashboard
+  namespace: chaos-testing
+spec:
+  host: chaos-dashboard
+  trafficPolicy:
+    tls:
+      mode: DISABLE

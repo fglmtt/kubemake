@@ -36,3 +36,10 @@
   - telemetry
   roles:
   - istio/addons
+
+- hosts: masters
+  become: no
+  tags:
+  - chaos
+  roles:
+  - chaos-mesh

@@ -1,0 +1,55 @@
+---
+- name: Delete manager profile in default namespace
+  kubernetes.core.k8s:
+    src: $HOME/chaos-rbac.yaml
+    state: absent
+
+- name: Delete rbac file for manager profile in default namespace
+  file:
+    path: $HOME/chaos-rbac.yaml
+    state: absent
+
+- name: Delete gateway and virtual service to access chaos dashboard remotely
+  kubernetes.core.k8s:
+    src: $HOME/chaos-dashboard.yaml
+    state: absent
+
+- name: Delete config file to access chaos dashboard remotely
+  file:
+    path: $HOME/chaos-dashboard.yaml
+    state: absent
+
+- name: Uninstall chaos-mesh
+  kubernetes.core.helm:
+    name: chaos-mesh
+    release_namespace: chaos-testing
+    state: absent
+    wait: yes
+
+- name: Delete chaos-testing namespace
+  kubernetes.core.k8s:
+    api_version: v1
+    kind: Namespace
+    name: chaos-testing
+    state: absent
+
+- name: Delete chaos-mesh repository
+  kubernetes.core.helm_repository:
+    name: chaos-mesh
+    state: absent
+
+- name: Uninstall helm
+  become: yes
+  file:
+    path: /usr/local/bin/helm
+    state: absent
+
+- name: Remove helm directories and installation script
+  file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+  - $HOME/.cache/helm
+  - $HOME/.config/helm
+  - $HOME/.local/share/helm
+  - $HOME/get-helm-3.sh
