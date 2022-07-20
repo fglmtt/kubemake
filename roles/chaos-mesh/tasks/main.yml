@@ -29,8 +29,20 @@
       chaosDaemon:
         runtime: crio
         socketPath: /var/run/crio/crio.sock
+      controllerManager:
+        enableFilterNamespace: true
       version: "{{ chaos_mesh_version }}"
 
+- name: Enable chaos-mesh in default namespace
+  kubernetes.core.k8s:
+    kind: Namespace
+    name: default
+    definition:
+      metadata:
+        annotations:
+          chaos-mesh.org/inject: enabled
+    state: patched
+  
 - name: Render template to access chaos dashboard remotely
   template:
     src: chaos-dashboard.j2

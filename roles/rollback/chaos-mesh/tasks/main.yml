@@ -19,6 +19,16 @@
     path: $HOME/chaos-dashboard.yaml
     state: absent
 
+- name: Disable chaos-mesh in default namespace
+  kubernetes.core.k8s:
+    kind: Namespace
+    name: default
+    definition:
+      metadata:
+        annotations:
+          chaos-mesh.org/inject: NULL
+    state: patched
+  
 - name: Uninstall chaos-mesh
   kubernetes.core.helm:
     name: chaos-mesh
