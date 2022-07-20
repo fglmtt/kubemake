@@ -39,3 +39,13 @@
 
 - name: Verify installation
   shell: istioctl verify-install -f $HOME/istio.yml
+
+- name: Enable sidecal injection in default namespace
+  kubernetes.core.k8s:
+    kind: Namespace
+    name: default
+    definition:
+      metadata:
+        labels:
+          istio-injection: enabled
+    state: patched

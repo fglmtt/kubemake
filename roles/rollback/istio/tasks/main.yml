@@ -1,4 +1,14 @@
 ---
+- name: Disable sidecal injection in default namespace
+  kubernetes.core.k8s:
+    kind: Namespace
+    name: default
+    definition:
+      metadata:
+        labels:
+          istio-injection: NULL
+    state: patched
+
 - name: Uninstall istio
   shell: istioctl x uninstall --purge --skip-confirmation
 
