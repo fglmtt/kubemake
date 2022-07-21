@@ -42,6 +42,6 @@
     update_cache: yes
   vars:
     packages:
-    - kubelet
-    - kubeadm
-    - kubectl
+    - kubelet={{ kubernetes_version }}
+    - kubeadm={{ kubernetes_version }}
+    - kubectl={{ kubernetes_version }}
