@@ -125,7 +125,7 @@ For example, the command
 ```
 anisble-playbook site.yml -i hosts -t setup,init,join,chaos
 ```
-makes a Kubernetes cluster and deploy Chaos Mesh on top of it.
+makes a Kubernetes cluster and deploys Chaos Mesh on top of it.
 
 Accodingly, to unmake
 ```
