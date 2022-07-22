@@ -181,7 +181,7 @@ By default, `kubemake`
 $ kubectl -n istio-system get service istio-ingressgateway -o jsonpath='{.spec.ports[?(@.name=="http2")].nodePort}
 ```
 
-If you do not hold the domain you specified in the [inventory](#inventory), upload the `/etc/hosts`
+If you do not hold the domain you specified in the [inventory](#inventory), upload the `/etc/hosts` file as follows:
 
 ```
 <ip>     grafana.yourdomain.edu
