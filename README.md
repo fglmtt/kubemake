@@ -103,13 +103,13 @@ chaos_mesh_version="v2.2.2"
 To make a Kubernetes-based cluster provided with all the [supported components](#supported-components), run:
 
 ```
-anisble-playbook site.yml -i hosts
+$ anisble-playbook site.yml -i hosts
 ```
 
 To unmake, run:
 
 ```
-anisble-playbook rollback-site.yml -i hosts
+$ anisble-playbook rollback-site.yml -i hosts
 ```
 
 If you are only interested in a subset of those components, you can use [Ansible tags](https://docs.ansible.com/ansible/latest/user_guide/playbooks_tags.html) to limit what `kubemake` does. Specifically
@@ -123,11 +123,80 @@ If you are only interested in a subset of those components, you can use [Ansible
 
 For example, the command
 ```
-anisble-playbook site.yml -i hosts -t setup,init,join,chaos
+$ anisble-playbook site.yml -i hosts -t setup,init,join,chaos
 ```
 makes a Kubernetes cluster and deploys Chaos Mesh on top of it.
 
 Accodingly, to unmake
 ```
-anisble-playbook rollback-site.yml -i hosts -t setup,init,join,chaos
+$ anisble-playbook rollback-site.yml -i hosts -t setup,init,join,chaos
 ```
+
+### Expected Result
+
+Let's assume you used the inventory above and ran:
+```
+$ ansible-playbook site.yml -i hosts
+```
+
+If you SSH into the master, you should get the following:
+```
+$ kubectl get pod --all-namespaces
+chaos-testing   chaos-controller-manager-6c6747db85-2cd5r   1/1     Running   (...)
+chaos-testing   chaos-controller-manager-6c6747db85-5mckg   1/1     Running   (...)
+chaos-testing   chaos-controller-manager-6c6747db85-nzbfb   1/1     Running   (...)
+chaos-testing   chaos-daemon-9ffzd                          1/1     Running   (...)
+chaos-testing   chaos-daemon-hb9mh                          1/1     Running   (...)
+chaos-testing   chaos-daemon-zsxc9                          1/1     Running   (...)
+chaos-testing   chaos-dashboard-f8578859d-27bxr             1/1     Running   (...)
+istio-system    grafana-78588947bf-nng9r                    1/1     Running   (...)
+istio-system    istio-egressgateway-59d4c446df-d84qd        1/1     Running   (...)
+istio-system    istio-ingressgateway-67d6475549-rpx5c       1/1     Running   (...)
+istio-system    istiod-544bd8d6bc-fkhld                     1/1     Running   (...)
+istio-system    jaeger-b5874fcc6-8n86n                      1/1     Running   (...)
+istio-system    kiali-575cc8cbf-vfkqn                       1/1     Running   (...)
+istio-system    prometheus-6544454f65-v286r                 2/2     Running   (...)
+kube-flannel    kube-flannel-ds-gdnn9                       1/1     Running   (...)
+kube-flannel    kube-flannel-ds-n7bkd                       1/1     Running   (...)
+kube-flannel    kube-flannel-ds-v2whg                       1/1     Running   (...)
+kube-flannel    kube-flannel-ds-wvvxv                       1/1     Running   (...)
+kube-system     coredns-6d4b75cb6d-c8vdg                    1/1     Running   (...)
+kube-system     coredns-6d4b75cb6d-grnh6                    1/1     Running   (...)
+kube-system     etcd-kube-master                            1/1     Running   (...)
+kube-system     kube-apiserver-kube-master                  1/1     Running   (...)
+kube-system     kube-controller-manager-kube-master         1/1     Running   (...)
+kube-system     kube-proxy-578rd                            1/1     Running   (...)
+kube-system     kube-proxy-5vwvn                            1/1     Running   (...)
+kube-system     kube-proxy-gdjvv                            1/1     Running   (...)
+kube-system     kube-proxy-vzvbv                            1/1     Running   (...)
+kube-system     kube-scheduler-kube-master                  1/1     Running   (...)
+```
+
+By default, `kubemake` 
+
+- enables [sidecar injection](https://istio.io/latest/docs/setup/additional-setup/sidecar-injection/) on the `default` namespace and restricts [the scope of Chaos Mesh](https://chaos-mesh.org/docs/configure-enabled-namespace/) to the same namespace;
+- exposes Grafana, Jaeger, Kiali, Prometheus, and Chaos Mesh dashboards through the Istio ingress gateway. To get the HTTP port of the Istio ingress gateway:
+
+```
+$ kubectl -n istio-system get service istio-ingressgateway -o jsonpath='{.spec.ports[?(@.name=="http2")].nodePort}
+```
+
+If you do not hold the domain you specified in the [inventory](#inventory), upload the `/etc/hosts`
+
+```
+<ip>     grafana.yourdomain.edu
+<ip>     kiali.yourdomain.edu
+<ip>     jaeger.yourdomain.edu
+<ip>     prometheus.yourdomain.edu
+<ip>     chaos.yourdomain.edu
+```
+
+Since the Istio ingress gateway is exposed as a NodePort service, you can use any cluster node's IP. The dashboards are available at the following links (where INGRESS_HTTP is the number you obtained before):
+
+* http://grafana.yourdomain.edu:INGRESS_HTTP
+* http://kiali.yourdomain.edu:INGRESS_HTTP
+* http://jaeger.yourdomain.edu:INGRESS_HTTP
+* http://prometheus.yourdomain.edu:INGRESS_HTTP
+* http://chaos.yourdomain.edu:INGRESS_HTTP
+
+**Note 6**: `kubemake` exposes such dashboards using the [unsecure method](https://istio.io/v1.1/docs/tasks/telemetry/gateways/). Do not use this in production.
