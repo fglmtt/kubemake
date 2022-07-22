@@ -100,7 +100,7 @@ chaos_mesh_version="v2.2.2"
 
 ### (Un)Make
 
-To make a Kubernetes-based cluster provided with all the (supported components)[#supported-components], run:
+To make a Kubernetes-based cluster provided with all the [supported components](#supported-components), run:
 
 ```
 anisble-playbook site.yml -i hosts
