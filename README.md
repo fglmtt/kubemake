@@ -103,13 +103,13 @@ chaos_mesh_version="v2.2.2"
 To make a Kubernetes-based cluster provided with all the [supported components](#supported-components), run:
 
 ```
-$ anisble-playbook site.yml -i hosts
+$ ansible-playbook site.yml -i hosts
 ```
 
 To unmake, run:
 
 ```
-$ anisble-playbook rollback-site.yml -i hosts
+$ ansible-playbook rollback-site.yml -i hosts
 ```
 
 If you are only interested in a subset of those components, you can use [Ansible tags](https://docs.ansible.com/ansible/latest/user_guide/playbooks_tags.html) to limit what `kubemake` does. Specifically
@@ -123,13 +123,13 @@ If you are only interested in a subset of those components, you can use [Ansible
 
 For example, the command
 ```
-$ anisble-playbook site.yml -i hosts -t setup,init,join,chaos
+$ ansible-playbook site.yml -i hosts -t setup,init,join,chaos
 ```
 makes a Kubernetes cluster and deploys Chaos Mesh on top of it.
 
 Accodingly, to unmake
 ```
-$ anisble-playbook rollback-site.yml -i hosts -t setup,init,join,chaos
+$ ansible-playbook rollback-site.yml -i hosts -t setup,init,join,chaos
 ```
 
 ### Expected Result
