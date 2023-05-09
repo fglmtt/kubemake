@@ -29,7 +29,7 @@
 
 - name: Download libcontainers-cri-o public signing key
   apt_key:
-    url: https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable:cri-o:{{ crio_version }}/{{ crio_os }}/Release.key
+    url: https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/{{ crio_version }}/{{ crio_os }}/Release.key
     keyring: /etc/apt/trusted.gpg.d/libcontainers-cri-o.gpg
 
 - name: Add libcontainers apt repository
