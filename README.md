@@ -16,40 +16,40 @@
 
 | Component | Version(s) |
 | --- | --- |
-| Kubernetes | 1.24.1 |
+| Kubernetes | 1.25.11 |
 
 ### Container Runtimes
 
 | Component | Version(s) |
 | --- | --- |
-| CRI-O | 1.24.1 |
+| CRI-O | 1.25 |
   
 ### Network Plugins
 
 | Component | Version(s) |
 | --- | --- |
-| Flannel | 0.19.0 |
+| Flannel | 0.22.0 |
 
 ### Service Meshes
 
 | Component | Version(s) |
 | --- | --- |
-| Istio | 1.14.1 |
+| Istio | 1.18.0 |
 
 ### Telemetry Addons
 
 | Component | Version(s) |
 | --- | --- |
-| Grafana | 8.3.1 |
-| Prometheus | 2.31.1 |
-| Jaeger | 1.29 |
-| Kiali | 1.50 |
+| Grafana | 9.0.1 |
+| Prometheus | 2.41.0 |
+| Jaeger | 1.35 |
+| Kiali | 1.67 |
 
 ### Chaos Engineering Tools
 
 | Component | Version(s) |
 | --- | --- |
-| Chaos Mesh | 2.2.2 |
+| Chaos Mesh | 2.6.1 |
   
 **Note 1**: the related versions are the ones that has been tested. Other versions might work as well.
   
@@ -81,17 +81,17 @@ worker-3 ansible_user=ubuntu ansible_host=192.168.1.4 kubelet_node_ip=192.168.1.
 
 [all:vars]
 ansible_password=your_sudo_password
-crio_version="1.24"
-crio_os=xUbuntu_20.04
-kubernetes_version="1.24.1-00"
+crio_version="1.25"
+crio_os="xUbuntu_20.04"
+kubernetes_version="1.25.11-00"
 
 [masters:vars]
 pod_network_cidr=10.244.0.0/16
 flannel_iface_regex=[eth1|eth0]
-istio_version="1.14.1"
+istio_version="1.18.0"
 istio_profile=demo
 istio_ingress_domain=yourdomain.edu
-chaos_mesh_version="v2.2.2"
+chaos_mesh_version="v2.6.1"
 ```
 
 **Note 4**: for the sake of brevity, this inventory also contains variables. Please look [here](https://docs.ansible.com/ansible/2.8/user_guide/playbooks_best_practices.html) for Ansible best practices.
