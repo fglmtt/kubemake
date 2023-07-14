@@ -34,13 +34,13 @@
 
 - name: Add libcontainers apt repository
   apt_repository:
-    repo: deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/{{ crio_os }}/ /
+    repo: deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/{{ crio_os }} /
     filename: devel:kubic:libcontainers:stable
     state: present
 
 - name: Add libcontainers-cri-o apt repository
   apt_repository:
-    repo: deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/{{ crio_version }}/{{ crio_os }}/ /
+    repo: deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/{{ crio_version }}/{{ crio_os }} /
     filename: devel:kubic:libcontainers:stable:cri-o:{{ crio_version }}
     state: present
 
