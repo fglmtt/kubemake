@@ -28,6 +28,7 @@
     kubeadm init 
     --apiserver-advertise-address={{ apiserver_advertise_address }} 
     --pod-network-cidr={{ pod_network_cidr }}
+    --apiserver-cert-extra-sans={{ apiserver_cert_extra_sans }}
   when:
   - ansible_facts['services']['kubelet.service']['state'] != 'running'
 

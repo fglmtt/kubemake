@@ -1,5 +1,5 @@
 [masters]
-master ansible_user=ubuntu ansible_host=192.168.1.1 kubelet_node_ip=192.168.1.1 apiserver_advertise_address=192.168.1.1
+master ansible_user=ubuntu ansible_host=192.168.1.1 kubelet_node_ip=192.168.1.1 apiserver_advertise_address=192.168.1.1 apiserver_cert_extra_sans=172.16.100.100
 
 [workers]
 worker-1 ansible_user=ubuntu ansible_host=192.168.1.2 kubelet_node_ip=192.168.1.2
