@@ -1,5 +1,5 @@
 ---
-- name: Disable sidecal injection in default namespace
+- name: Disable sidecar injection in default namespace
   kubernetes.core.k8s:
     kind: Namespace
     name: default
