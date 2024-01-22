@@ -1,5 +1,5 @@
 ---
-- name: Uninstall cri-o and cri-o-runc
+- name: Uninstall cri-o, cri-o-runc, and containernetworking-plugins
   apt:
     name: "{{ packages }}"
     state: absent
@@ -7,6 +7,7 @@
     packages:
     - cri-o
     - cri-o-runc
+    - containernetworking-plugins
 
 - name: Remove libcontainers-cri-o apt repository
   apt_repository:
