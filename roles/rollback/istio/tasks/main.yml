@@ -10,7 +10,7 @@
     state: patched
 
 - name: Uninstall istio
-  shell: istioctl x uninstall --purge --skip-confirmation
+  shell: istioctl uninstall --purge --skip-confirmation
 
 - name: Delete istio-system namespace
   kubernetes.core.k8s:
