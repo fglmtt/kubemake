@@ -1,5 +1,5 @@
 ---
-- name: Uninstall packages needed to use the K8s apt repository
+- name: Uninstall packages needed to use the custom apt repositories
   apt:
     name: "{{ packages }}"
     state: absent
@@ -8,3 +8,4 @@
     - apt-transport-https
     - ca-certificates
     - curl
+    - gpg

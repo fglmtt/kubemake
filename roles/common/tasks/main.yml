@@ -1,5 +1,5 @@
 ---
-- name: Install packages needed to use the K8s apt repository
+- name: Install packages needed to use custom apt repositories
   apt:
     name: "{{ packages }}"
     state: present
@@ -9,3 +9,4 @@
     - apt-transport-https
     - ca-certificates
     - curl
+    - gpg
