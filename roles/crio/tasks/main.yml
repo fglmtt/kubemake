@@ -50,7 +50,7 @@
     filename: devel:kubic:libcontainers:stable:cri-o:{{ crio_version }}
     state: present
 
-- name: Install cri-o and cri-o-runc
+- name: Install cri-o, cri-o-runc, and containernetworking-plugins
   apt:
     name: "{{ packages }}"
     state: present
@@ -59,6 +59,7 @@
     packages:
     - cri-o
     - cri-o-runc
+    - containernetworking-plugins
 
 - name: Daemon reload
   shell: systemctl daemon-reload
