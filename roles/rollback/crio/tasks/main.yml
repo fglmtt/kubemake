@@ -10,24 +10,28 @@
 
 - name: Remove libcontainers-cri-o apt repository
   apt_repository:
-    repo: deb http://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/{{ crio_version }}/{{ crio_os }}/ /
+    repo: |
+      deb [signed-by=/usr/share/keyrings/libcontainers-crio-archive-keyring.gpg]
+      http://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/{{ crio_version }}/{{ crio_os }}/ /
     filename: devel:kubic:libcontainers:stable:cri-o:{{ crio_version }}
     state: absent
 
 - name: Remove libcontainers apt repository
   apt_repository:
-    repo: deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/{{ crio_os }}/ /
+    repo: |
+      deb [signed-by=/usr/share/keyrings/libcontainers-archive-keyring.gpg]
+      https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/{{ crio_os }}/ /
     filename: devel:kubic:libcontainers:stable
     state: absent
 
 - name: Delete libcontainers-cri-o public signing key
   file:
-    path: /etc/apt/trusted.gpg.d/libcontainers-cri-o.gpg
+    path: /usr/share/keyrings/libcontainers-crio-archive-keyring.gpg
     state: absent
 
 - name: Delete libcontainers public signing key
   file:
-    path: /etc/apt/trusted.gpg.d/libcontainers.gpg
+    path: /usr/share/keyrings/libcontainers-archive-keyring.gpg
     state: absent
 
 - name: Delete /etc/sysctl.d/99-kubernetes-cri.conf

@@ -1,4 +1,5 @@
 ---
+# https://kubernetes.io/docs/setup/production-environment/container-runtimes/
 - name: Add crio configuration file to /etc/modules-load.d/
   copy:
     src: modules-load.conf
@@ -22,25 +23,30 @@
 - name: Force sysctl to load settings from all system conf files
   shell: sysctl --system
 
+# https://github.com/cri-o/cri-o/blob/main/install.md#apt-based-operating-systems
 - name: Download libcontainers public signing key
   apt_key:
     url: https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/{{crio_os}}/Release.key
-    keyring: /etc/apt/trusted.gpg.d/libcontainers.gpg
+    keyring: /usr/share/keyrings/libcontainers-archive-keyring.gpg
 
 - name: Download libcontainers-cri-o public signing key
   apt_key:
     url: https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/{{ crio_version }}/{{ crio_os }}/Release.key
-    keyring: /etc/apt/trusted.gpg.d/libcontainers-cri-o.gpg
+    keyring: /usr/share/keyrings/libcontainers-crio-archive-keyring.gpg
 
 - name: Add libcontainers apt repository
   apt_repository:
-    repo: deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/{{ crio_os }}/ /
+    repo: |
+      deb [signed-by=/usr/share/keyrings/libcontainers-archive-keyring.gpg]
+      https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/{{ crio_os }}/ /
     filename: devel:kubic:libcontainers:stable
     state: present
 
 - name: Add libcontainers-cri-o apt repository
   apt_repository:
-    repo: deb http://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/{{ crio_version }}/{{ crio_os }}/ /
+    repo: |
+      deb [signed-by=/usr/share/keyrings/libcontainers-crio-archive-keyring.gpg]
+      http://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/{{ crio_version }}/{{ crio_os }}/ /
     filename: devel:kubic:libcontainers:stable:cri-o:{{ crio_version }}
     state: present
 
