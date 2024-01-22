@@ -23,7 +23,8 @@
   delay: 5
   failed_when: false
 
-- name: Initialize the K8s cluster
+# https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/
+- name: Initialize the k8s cluster
   shell: >
     kubeadm init 
     --apiserver-advertise-address={{ apiserver_advertise_address }} 
@@ -38,7 +39,7 @@
     path: $HOME/.kube
     state: directory
 
-- name: Copy K8s config file in ~/.kube
+- name: Copy k8s config file in ~/.kube
   copy:
     src: /etc/kubernetes/admin.conf
     remote_src: yes
@@ -46,6 +47,7 @@
     owner: "{{ ansible_user }}"
     group: "{{ ansible_user }}"
 
+# https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/kubelet-integration/
 - name: Set --node-ip for kubelet
   lineinfile:
     path: /lib/systemd/system/kubelet.service.d/10-kubeadm.conf

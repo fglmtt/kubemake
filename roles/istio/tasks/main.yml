@@ -1,4 +1,5 @@
 ---
+# https://istio.io/latest/docs/setup/getting-started/
 - name: Get script to download istio
   get_url:
     url: https://istio.io/downloadIstio
