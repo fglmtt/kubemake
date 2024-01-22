@@ -45,7 +45,7 @@
 
 - name: Set --node-ip for kubelet
   lineinfile:
-    path: /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+    path: /lib/systemd/system/kubelet.service.d/10-kubeadm.conf
     regexp: '^Environment="KUBELET_CONFIG_ARGS=--config=/var/lib/kubelet/config.yaml"'
     line: 'Environment="KUBELET_CONFIG_ARGS=--config=/var/lib/kubelet/config.yaml --node-ip={{ kubelet_node_ip }}"'
 
