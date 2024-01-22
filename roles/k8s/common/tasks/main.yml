@@ -1,37 +1,18 @@
 ---
+# https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/
 - name: Disable swap
   shell: swapoff -a
 
-- name: Add k8s configiguration file to /etc/modules-load.d/
-  copy:
-    src: modules-load.conf
-    dest: /etc/modules-load.d/k8s.conf
-    owner: root
-    group: root
-
-- name: Ensure br_netfilter module is loaded
-  shell: modprobe br_netfilter
-
-- name: Ensure iptables corretly see bridged traffic
-  copy:
-    src: iptables.conf
-    dest: /etc/sysctl.d/k8s.conf
-    owner: root
-    group: root
-
-- name: Force sysctl to load settings from all system conf files
-  shell: sysctl --system
-
-- name: Download the Google Cloud public signing key
+- name: Download k8s public signing key
   apt_key:
-    url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+    url: https://pkgs.k8s.io/core:/stable:/{{kubernetes_version_repo}}/{{kubernetes_os}}/Release.key
     keyring: /usr/share/keyrings/kubernetes-archive-keyring.gpg
 
-- name: Add the K8s apt repository
+- name: Add k8s apt repository
   apt_repository:
     repo: |
       deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] 
-      https://apt.kubernetes.io/ kubernetes-xenial main
+      https://pkgs.k8s.io/core:/stable:/{{kubernetes_version_repo}}/{{kubernetes_os}}/ /
     filename: kubernetes
     state: present
 
@@ -42,6 +23,6 @@
     update_cache: yes
   vars:
     packages:
-    - kubelet={{ kubernetes_version }}
-    - kubeadm={{ kubernetes_version }}
-    - kubectl={{ kubernetes_version }}
+    - kubelet={{ kubernetes_version_pkg }}
+    - kubeadm={{ kubernetes_version_pkg }}
+    - kubectl={{ kubernetes_version_pkg }}
