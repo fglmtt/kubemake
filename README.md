@@ -10,46 +10,46 @@
 
 | Component | Version(s) |
 | --- | --- |
-| Ubuntu | 20.04 |
+| Ubuntu | 22.04 |
 
 ### Kubernetes Distributions
 
 | Component | Version(s) |
 | --- | --- |
-| Kubernetes | 1.24.1 |
+| Kubernetes | 1.28.6 |
 
 ### Container Runtimes
 
 | Component | Version(s) |
 | --- | --- |
-| CRI-O | 1.24.1 |
+| CRI-O | 1.28 |
   
 ### Network Plugins
 
 | Component | Version(s) |
 | --- | --- |
-| Flannel | 0.19.0 |
+| Flannel | 0.24.2 |
 
 ### Service Meshes
 
 | Component | Version(s) |
 | --- | --- |
-| Istio | 1.14.1 |
+| Istio | 1.20.2 |
 
 ### Telemetry Addons
 
 | Component | Version(s) |
 | --- | --- |
-| Grafana | 8.3.1 |
-| Prometheus | 2.31.1 |
-| Jaeger | 1.29 |
-| Kiali | 1.50 |
+| Grafana | 9.5.5 |
+| Prometheus | 2.41.0 |
+| Jaeger | 1.46 |
+| Kiali | 1.76 |
 
 ### Chaos Engineering Tools
 
 | Component | Version(s) |
 | --- | --- |
-| Chaos Mesh | 2.2.2 |
+| Chaos Mesh | 2.6.1 |
   
 **Note 1**: the related versions are the ones that has been tested. Other versions might work as well.
   
@@ -66,13 +66,23 @@
 
 ## Quick Start
 
+## Ansible
+
+Install Ansible in a Python virtual environment:
+
+```
+$ python3 -m venv .venv
+$ source .venv/bin/activate
+$ pip install -r requirements.txt
+```
+
 ### Inventory
 
 The first thing you need is to build your [inventory](https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html). An example of inventory is the following:
 
 ```
 [masters]
-master ansible_user=ubuntu ansible_host=192.168.1.1 kubelet_node_ip=192.168.1.1 apiserver_advertise_address=192.168.1.1
+master ansible_user=ubuntu ansible_host=192.168.1.1 kubelet_node_ip=192.168.1.1 apiserver_advertise_address=192.168.1.1 apiserver_cert_extra_sans=172.16.100.100
 
 [workers]
 worker-1 ansible_user=ubuntu ansible_host=192.168.1.2 kubelet_node_ip=192.168.1.2
@@ -80,18 +90,20 @@ worker-2 ansible_user=ubuntu ansible_host=192.168.1.3 kubelet_node_ip=192.168.1.
 worker-3 ansible_user=ubuntu ansible_host=192.168.1.4 kubelet_node_ip=192.168.1.4
 
 [all:vars]
-ansible_password=your_sudo_password
-crio_version="1.24"
-crio_os=xUbuntu_20.04
-kubernetes_version="1.24.1-00"
+ansible_ssh_private_key_file=/path/to/your/pem
+crio_version="1.28"
+crio_os=xUbuntu_22.04
+kubernetes_version_repo="v1.28"
+kubernetes_os="deb"
+kubernetes_version_pkg="1.28.6-1.1"
 
 [masters:vars]
 pod_network_cidr=10.244.0.0/16
 flannel_iface_regex=[eth1|eth0]
-istio_version="1.14.1"
+istio_version="1.20.2"
 istio_profile=demo
 istio_ingress_domain=yourdomain.edu
-chaos_mesh_version="v2.2.2"
+chaos_mesh_version="v2.6.1"
 ```
 
 **Note 4**: for the sake of brevity, this inventory also contains variables. Please look [here](https://docs.ansible.com/ansible/2.8/user_guide/playbooks_best_practices.html) for Ansible best practices.
