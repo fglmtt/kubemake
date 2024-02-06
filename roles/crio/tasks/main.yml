@@ -24,6 +24,7 @@
   shell: sysctl --system
 
 # https://github.com/cri-o/cri-o/blob/main/install.md#apt-based-operating-systems
+# https://github.com/cri-o/cri-o/blob/main/tutorials/kubernetes.md
 - name: Download libcontainers public signing key
   apt_key:
     url: https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/{{crio_os}}/Release.key
