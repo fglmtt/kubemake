@@ -50,7 +50,7 @@
     filename: devel:kubic:libcontainers:stable:cri-o:{{ crio_version }}
     state: present
 
-- name: Install cri-o, cri-o-runc, and containernetworking-plugins
+- name: Install cri-o and cri-o-runc
   apt:
     name: "{{ packages }}"
     state: present
@@ -59,10 +59,13 @@
     packages:
     - cri-o
     - cri-o-runc
-    - containernetworking-plugins
 
 - name: Daemon reload
-  shell: systemctl daemon-reload
+  systemd_service:
+    daemon_reload: true
 
-- name: Enable cri-o
-  shell: systemctl enable crio --now
+- name: Enable and start cri-o
+  systemd_service:
+    name: crio
+    enabled: true
+    state: started
