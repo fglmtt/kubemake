@@ -1,0 +1,31 @@
+---
+- name: Download cni-plugins archive
+  get_url:
+    url: https://github.com/containernetworking/plugins/releases/download/{{ cni_version }}/cni-plugins-linux-{{ cni_arch }}-{{ cni_version }}.tgz
+    dest: $HOME/cni-plugins-linux-{{ cni_arch }}-{{ cni_version }}.tgz
+
+- name: Create /opt/cni/bin
+  file:
+    path: /opt/cni/bin
+    state: directory
+
+- name: Extract cni-plugins to /opt/cni/bin/
+  unarchive:
+    src: $HOME/cni-plugins-linux-{{ cni_arch }}-{{ cni_version }}.tgz
+    dest: /opt/cni/bin
+    remote_src: yes
+
+- name: Delete cni-plugins archive
+  file:
+    path: $HOME/cni-plugins-linux-{{ cni_arch }}-{{ cni_version }}.tgz
+    state: absent
+
+- name: Restart service crio
+  systemd_service:
+    name: crio
+    state: restarted
+
+- name: Restart service kubelet
+  systemd_service:
+    name: kubelet
+    state: restarted

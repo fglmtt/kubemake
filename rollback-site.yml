@@ -40,6 +40,7 @@
   tags:
   - setup
   roles:
+  - rollback/cni
   - rollback/k8s/common
   - rollback/crio
   - rollback/common
