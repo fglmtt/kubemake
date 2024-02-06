@@ -8,8 +8,11 @@
     --ignore-daemonsets
   delegate_to: "{{ groups['masters'][0] }}"
 
-- name: Reset node
-  shell: kubeadm reset --force
+- name: Reset worker node
+  shell: >
+    kubeadm reset
+    --cri-socket={{ cri_socket }}
+    --force
 
 - name: Reset iptables
   shell: |
@@ -17,6 +20,11 @@
     iptables -t nat -F
     iptables -t mangle -F
     iptables -X
+
+- name: Delete /etc/default/kubelet
+  file:
+    path: /etc/default/kubelet
+    state: absent
 
 - name: Delete node
   become: no

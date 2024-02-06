@@ -29,6 +29,7 @@
     kubeadm init 
     --apiserver-advertise-address={{ apiserver_advertise_address }} 
     --pod-network-cidr={{ pod_network_cidr }}
+    --cri-socket={{ cri_socket }}
     --apiserver-cert-extra-sans={{ apiserver_cert_extra_sans }}
   when:
   - ansible_facts['services']['kubelet.service']['state'] != 'running'
@@ -47,12 +48,11 @@
     owner: "{{ ansible_user }}"
     group: "{{ ansible_user }}"
 
-# https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/kubelet-integration/
-- name: Set --node-ip for kubelet
+- name: Create /etc/default/kubelet to set --node-ip
   lineinfile:
-    path: /lib/systemd/system/kubelet.service.d/10-kubeadm.conf
-    regexp: '^Environment="KUBELET_CONFIG_ARGS=--config=/var/lib/kubelet/config.yaml"'
-    line: 'Environment="KUBELET_CONFIG_ARGS=--config=/var/lib/kubelet/config.yaml --node-ip={{ kubelet_node_ip }}"'
+    path: /etc/default/kubelet
+    line: KUBELET_EXTRA_ARGS=--node-ip={{ kubelet_node_ip }}
+    create: true
 
 - name: Restart service kubelet
   systemd:

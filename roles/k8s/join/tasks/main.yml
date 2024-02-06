@@ -15,7 +15,7 @@
 - name: Join cluster
   block:
   - name: Run join command
-    shell: "{{ join_cmd.stdout_lines[0] }}"
+    shell: "{{ join_cmd.stdout_lines[0] }} --cri-socket={{ cri_socket }}"
     when:
     - k8s_node.resources == []
 
@@ -43,11 +43,11 @@
         type: "Ready"
     delegate_to: "{{ groups['masters'][0] }}"
 
-- name: Set --node-ip for kubelet
+- name: Create /etc/default/kubelet to set --node-ip
   lineinfile:
-    path: /lib/systemd/system/kubelet.service.d/10-kubeadm.conf
-    regexp: '^Environment="KUBELET_CONFIG_ARGS=--config=/var/lib/kubelet/config.yaml"'
-    line: 'Environment="KUBELET_CONFIG_ARGS=--config=/var/lib/kubelet/config.yaml --node-ip={{ kubelet_node_ip }}"'
+    path: /etc/default/kubelet
+    line: KUBELET_EXTRA_ARGS=--node-ip={{ kubelet_node_ip }}
+    create: true
 
 - name: Restart service kubelet
   systemd:

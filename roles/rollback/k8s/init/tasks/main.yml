@@ -1,6 +1,9 @@
 ---
 - name: Reset the control plane node
-  shell: kubeadm reset --force
+  shell: >
+    kubeadm reset
+    --cri-socket={{ cri_socket }}
+    --force
 
 - name: Reset iptables
   shell: |
@@ -8,6 +11,11 @@
     iptables -t nat -F
     iptables -t mangle -F
     iptables -X
+
+- name: Delete /etc/default/kubelet
+  file:
+    path: /etc/default/kubelet
+    state: absent
 
 - name: Delete ~/.kube/directory
   become: no
