@@ -32,8 +32,16 @@
   tags:
   - init
   roles:
+  - rollback/nvidia/k8s
   - rollback/flannel
   - rollback/k8s/init
+
+- hosts: gpus
+  become: yes
+  tags:
+  - setup
+  roles:
+  - rollback/nvidia/crio
 
 - hosts: all
   become: yes

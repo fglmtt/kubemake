@@ -1,0 +1,12 @@
+---
+- name: Delete nvidia device plugin
+  become: no
+  kubernetes.core.k8s:
+    src: $HOME/nvidia-device-plugin.yml
+    state: absent
+
+- name: Delete nvidia device plugin manifest
+  become: no
+  file:
+    path: $HOME/nvidia-device-plugin.yml
+    state: absent

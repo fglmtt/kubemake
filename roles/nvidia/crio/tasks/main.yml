@@ -1,0 +1,21 @@
+---
+# https://github.com/NVIDIA/k8s-device-plugin
+# TODO: add libnvidia-container apt repository
+# TODO: install nvidia-container-toolkit
+- name: Set nvidia-container-runtime as the default low-level OCI runtime
+  shell: >
+    nvidia-ctk runtime configure 
+    --runtime=crio 
+    --set-as-default 
+    --config=/etc/crio/crio.conf.d/99-nvidia.conf
+
+- name: Add crun to the list of runtimes
+  lineinfile:
+    path: /etc/nvidia-container-runtime/config.toml
+    regexp: '^runtimes ='
+    line: 'runtimes = ["crun", "docker-runc", "runc"]'
+
+- name: Restart crio
+  systemd_service:
+    name: crio
+    state: restarted

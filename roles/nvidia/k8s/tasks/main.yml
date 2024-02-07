@@ -1,0 +1,14 @@
+---
+# https://github.com/NVIDIA/k8s-device-plugin
+- name: Download nvidia device plugin manifest
+  become: no
+  get_url:
+    url: https://raw.githubusercontent.com/NVIDIA/k8s-device-plugin/{{ nvidia_device_plugin_version }}/nvidia-device-plugin.yml
+    dest: $HOME/nvidia-device-plugin.yml
+
+- name: Deploy nvidia device plugin to the cluster
+  become: no
+  kubernetes.core.k8s:
+    src: $HOME/nvidia-device-plugin.yml
+    state: present
+

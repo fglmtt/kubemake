@@ -9,6 +9,13 @@
   - k8s/common
   - cni
 
+- hosts: gpus
+  become: yes
+  tags:
+  - setup
+  roles:
+  - nvidia/crio
+
 - hosts: masters
   become: yes
   tags:
@@ -16,6 +23,7 @@
   roles:
   - k8s/init
   - flannel
+  - nvidia/k8s
 
 - hosts: workers
   become: yes

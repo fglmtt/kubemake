@@ -1,0 +1,16 @@
+---
+- name: Remove crun to the list of runtimes
+  lineinfile:
+    path: /etc/nvidia-container-runtime/config.toml
+    regexp: '^runtimes ='
+    line: 'runtimes = ["docker-runc", "runc"]'
+
+- name: Unset nvidia-container-runtime as the default low-level OCI runtime
+  file:
+    path: /etc/crio/crio.conf.d/99-nvidia.conf
+    state: absent
+
+- name: Restart crio
+  systemd_service:
+    name: crio
+    state: restarted
