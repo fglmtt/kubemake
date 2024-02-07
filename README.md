@@ -4,50 +4,63 @@
 
 ## Supported Components
 
-`kubemake` currently supports the components listed below. 
+`kubemake` currently supports the components listed below.
+
+### System Architectures
+
+| System Architecture |
+| --- |
+| amd64 |
+| arm64 |
 
 ### Operating Systems
 
-| Component | Version(s) |
+| Operating System | Version(s) |
 | --- | --- |
-| Ubuntu | 22.04 |
+| Ubuntu | 20.04, 22.04 |
 
 ### Kubernetes Distributions
 
-| Component | Version(s) |
+| Kubernetes Distribution | Version(s) |
 | --- | --- |
-| Kubernetes | 1.28.6 |
+| Kubernetes | > 1.24 |
 
 ### Container Runtimes
 
-| Component | Version(s) |
+| Container Runtime | Version(s) |
 | --- | --- |
-| CRI-O | 1.28 |
+| CRI-O | > 1.24 |
   
 ### Network Plugins
 
-| Component | Version(s) |
+| Network Plugin | Version(s) |
 | --- | --- |
-| Flannel | 0.24.2 |
+| Flannel | See [here](https://github.com/flannel-io/flannel/blob/master/Documentation/kube-flannel.yml) |
+
+### Device Plugins
+
+| Device Plugin | Version(s) |
+| --- | --- |
+| NVIDIA | 0.14.4 |
 
 ### Service Meshes
 
-| Component | Version(s) |
+| Service Mesh | Version(s) |
 | --- | --- |
 | Istio | 1.20.2 |
 
 ### Telemetry Addons
 
-| Component | Version(s) |
+| Telemetry Addon | Version(s) |
 | --- | --- |
-| Grafana | 9.5.5 |
-| Prometheus | 2.41.0 |
-| Jaeger | 1.46 |
-| Kiali | 1.76 |
+| Grafana | See [here](https://github.com/istio/istio/tree/master/manifests/addons) |
+| Prometheus | See [here](https://github.com/istio/istio/tree/master/manifests/addons) |
+| Jaeger | See [here](https://github.com/istio/istio/tree/master/manifests/addons) |
+| Kiali | See [here](https://github.com/istio/istio/tree/master/manifests/addons) |
 
 ### Chaos Engineering Tools
 
-| Component | Version(s) |
+| Chaos Engineering Tool | Version(s) |
 | --- | --- |
 | Chaos Mesh | 2.6.1 |
   
@@ -85,21 +98,28 @@ The first thing you need is to build your [inventory](https://docs.ansible.com/a
 master ansible_user=ubuntu ansible_host=192.168.1.1 kubelet_node_ip=192.168.1.1 apiserver_advertise_address=192.168.1.1 apiserver_cert_extra_sans=172.16.100.100
 
 [workers]
-worker-1 ansible_user=ubuntu ansible_host=192.168.1.2 kubelet_node_ip=192.168.1.2
-worker-2 ansible_user=ubuntu ansible_host=192.168.1.3 kubelet_node_ip=192.168.1.3
-worker-3 ansible_user=ubuntu ansible_host=192.168.1.4 kubelet_node_ip=192.168.1.4
+worker-1 ansible_user=ubuntu ansible_host=192.168.1.2 kubelet_node_ip=192.168.1.2 crio_os=xUbuntu_22.04 cni_arch=amd64
+worker-2 ansible_user=ubuntu ansible_host=192.168.1.3 kubelet_node_ip=192.168.1.3 crio_os=xUbuntu_22.04 cni_arch=amd64
+worker-3 ansible_user=ubuntu ansible_host=192.168.1.4 kubelet_node_ip=192.168.1.4 crio_os=xUbuntu_20.04 cni_arch=arm64
+
+[gpus]
+worker-3 ansible_user=ubuntu ansible_host=192.168.1.4
 
 [all:vars]
 ansible_ssh_private_key_file=/path/to/your/pem
 crio_version="1.28"
 crio_os=xUbuntu_22.04
+cni_arch=amd64
+cni_version="v1.4.0"
 kubernetes_version_repo="v1.28"
 kubernetes_os="deb"
 kubernetes_version_pkg="1.28.6-1.1"
+cri_socket="unix:/run/crio/crio.sock"
 
 [masters:vars]
 pod_network_cidr=10.244.0.0/16
 flannel_iface_regex=[eth1|eth0]
+nvidia_device_plugin_version="v0.14.4"
 istio_version="1.20.2"
 istio_profile=demo
 istio_ingress_domain=yourdomain.edu
