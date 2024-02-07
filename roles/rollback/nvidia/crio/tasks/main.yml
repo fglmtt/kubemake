@@ -13,4 +13,22 @@
 - name: Restart crio
   systemd_service:
     name: crio
-    state: restarted
+
+- name: Uninstall nvidia-container-toolkit
+  apt:
+    name: nvidia-container-toolkit
+    state: absent
+
+- name: Remove libnvidia-container apt repository
+  apt_repository:
+    repo: |
+      deb [signed-by=/usr/share/keyrings/libnvidia-container-keyring.gpg]
+       https://nvidia.github.io/libnvidia-container/stable/deb/$(ARCH)/ /
+    filename: libnvidia-container
+    state: absent
+
+- name: Remove libnvidia-container public signing key
+  file:
+    path: /usr/share/keyrings/libnvidia-container-keyring.gpg
+    state: absent
+

@@ -1,7 +1,25 @@
 ---
 # https://github.com/NVIDIA/k8s-device-plugin
-# TODO: add libnvidia-container apt repository
-# TODO: install nvidia-container-toolkit
+- name: Download libnvidia-container public signing key
+  apt_key:
+    url: https://nvidia.github.io/libnvidia-container/gpgkey
+    keyring: /usr/share/keyrings/libnvidia-container-keyring.gpg
+
+- name: Add libnvidia-container apt repository
+  apt_repository:
+    repo: |
+      deb [signed-by=/usr/share/keyrings/libnvidia-container-keyring.gpg]
+       https://nvidia.github.io/libnvidia-container/stable/deb/$(ARCH)/ /
+    filename: libnvidia-container
+    state: present
+
+# crio runtime issues with prior versions, thus >= 1.14
+- name: Install nvidia-container-toolkit
+  apt:
+    name: nvidia-container-toolkit>=1.14
+    update_cache: true
+    state: present
+
 - name: Set nvidia-container-runtime as the default low-level OCI runtime
   shell: >
     nvidia-ctk runtime configure 
