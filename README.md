@@ -108,8 +108,6 @@ worker-3 ansible_user=ubuntu ansible_host=192.168.1.4
 [all:vars]
 ansible_ssh_private_key_file=/path/to/your/pem
 crio_version="1.28"
-crio_os=xUbuntu_22.04
-cni_arch=amd64
 cni_version="v1.4.0"
 kubernetes_version_repo="v1.28"
 kubernetes_os="deb"
