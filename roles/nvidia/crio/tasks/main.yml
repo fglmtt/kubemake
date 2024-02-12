@@ -16,9 +16,13 @@
 # crio runtime issues with prior versions, thus >= 1.14
 - name: Install nvidia-container-toolkit
   apt:
-    name: nvidia-container-toolkit>=1.14
+    name: "{{ packages }}"
     update_cache: true
     state: present
+  vars:
+    packages:
+    - nvidia-container-toolkit-base>=1.14
+    - nvidia-container-toolkit>=1.14
 
 - name: Set nvidia-container-runtime as the default low-level OCI runtime
   shell: >
