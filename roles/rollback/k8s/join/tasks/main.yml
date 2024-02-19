@@ -51,3 +51,8 @@
   - "'Cannot find device \"cni0\"' not in del_cni.stderr"
   changed_when:
   - del_cni.rc == 0
+
+- name: Delete /run/flannel/
+  file:
+    path: /run/flannel
+    state: absent
