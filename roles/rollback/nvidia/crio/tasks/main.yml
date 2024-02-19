@@ -16,8 +16,12 @@
 
 - name: Uninstall nvidia-container-toolkit
   apt:
-    name: nvidia-container-toolkit
+    name: "{{ packages }}"
     state: absent
+  vars:
+    packages:
+    - nvidia-container-toolkit
+    - nvidia-container-toolkit-base
 
 - name: Remove libnvidia-container apt repository
   apt_repository:
