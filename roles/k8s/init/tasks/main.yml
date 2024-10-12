@@ -34,7 +34,7 @@
   when:
   - ansible_facts['services']['kubelet.service']['state'] != 'running'
 
-- name: Create ~/.kube diectory
+- name: Create ~/.kube directory
   become: no
   file:
     path: $HOME/.kube
