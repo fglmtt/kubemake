@@ -2,6 +2,13 @@
 - hosts: masters
   become: no
   tags:
+  - serverless
+  roles:
+  - rollback/fission
+
+- hosts: masters
+  become: no
+  tags:
   - chaos
   roles:
   - rollback/chaos-mesh

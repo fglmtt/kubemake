@@ -1,0 +1,31 @@
+---
+- name: Delete cli
+  become: yes
+  file:
+    path: '/usr/local/bin/fission'
+    state: absent
+
+- name: Uninstall fission
+  kubernetes.core.helm:
+    name: fission
+    namespace: "{{ fission_namespace }}"
+    state: absent
+
+- name: Remove helm repository
+  kubernetes.core.helm_repository:
+    name: fission-charts
+    state: absent
+
+- name: Delete crds
+  command: kubectl delete -k "github.com/fission/fission/crds/v1?ref={{ fission_version }}"
+  register: result
+  failed_when: 
+  - result.rc != 0
+  - "'NotFound' not in result.stderr"
+
+- name: Delete namespace
+  kubernetes.core.k8s:
+    api_version: v1
+    kind: Namespace
+    name: "{{ fission_namespace }}"
+    state: absent

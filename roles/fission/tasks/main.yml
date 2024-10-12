@@ -1,0 +1,36 @@
+---
+- name: Create namespace
+  kubernetes.core.k8s:
+    api_version: v1
+    kind: Namespace
+    name: "{{ fission_namespace }}"
+    state: present
+
+- name: Create crds
+  command: kubectl create -k "github.com/fission/fission/crds/v1?ref={{ fission_version }}"
+  register: result
+  failed_when: 
+  - result.rc != 0
+  - "'AlreadyExists' not in result.stderr"
+
+- name: Add helm repository
+  kubernetes.core.helm_repository:
+    name: fission-charts
+    repo_url: https://fission.github.io/fission-charts/
+
+- name: Install fission
+  kubernetes.core.helm:
+    name: fission
+    chart_ref: fission-charts/fission-all
+    namespace: "{{ fission_namespace }}"
+    chart_version: "{{ fission_version }}"
+    values:
+      persistence:
+        enabled: false
+
+- name: Install cli
+  become: yes
+  get_url:
+    url: 'https://github.com/fission/fission/releases/download/{{ fission_version }}/fission-{{ fission_version }}-linux-{{ cni_arch }}'
+    dest: '/usr/local/bin/fission'
+    mode: '0755'

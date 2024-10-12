@@ -65,6 +65,6 @@
 - hosts: masters
   become: no
   tags:
-  - fission
+  - serverless
   roles:
   - fission
