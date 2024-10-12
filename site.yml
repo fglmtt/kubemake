@@ -51,6 +51,7 @@
   tags:
   - telemetry
   roles:
+  - metrics-server
   - istio/addons
 
 - hosts: masters

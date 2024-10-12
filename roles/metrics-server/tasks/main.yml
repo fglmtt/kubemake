@@ -1,0 +1,16 @@
+---
+- name: Add metrics-server repository
+  kubernetes.core.helm_repository:
+    name: metrics-server
+    repo_url: "https://kubernetes-sigs.github.io/metrics-server"
+
+- name: Install metrics-server
+  kubernetes.core.helm:
+    name: metrics-server
+    release_namespace: kube-system
+    chart_ref: metrics-server/metrics-server
+    values:
+      metrics:
+        enabled: true
+      args:
+      - --kubelet-insecure-tls
