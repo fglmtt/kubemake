@@ -1,0 +1,11 @@
+---
+- name: Uninstall kube-state-metrics
+  kubernetes.core.helm:
+    name: kube-state-metrics
+    release_namespace: kube-system
+    state: absent
+
+- name: Remove prometheus-community repository
+  kubernetes.core.helm_repository:
+    name: prometheus-community
+    state: absent

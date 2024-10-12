@@ -52,6 +52,7 @@
   - telemetry
   roles:
   - metrics-server
+  - kube-state-metrics
   - istio/addons
 
 - hosts: masters

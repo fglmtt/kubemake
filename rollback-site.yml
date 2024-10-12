@@ -11,6 +11,7 @@
   tags:
   - telemetry
   roles:
+  - rollback/kube-state-metrics
   - rollback/metrics-server
   - rollback/istio/addons
 
