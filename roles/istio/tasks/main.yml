@@ -31,6 +31,7 @@
   shell: >
     istioctl install 
     --set profile={{ istio_profile }}
+    --set values.pilot.env.ENABLE_NATIVE_SIDECARS=true
     --skip-confirmation
 
 - name: Generate manifest
