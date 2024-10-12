@@ -35,6 +35,13 @@
 - hosts: masters
   become: no
   tags:
+  - helm
+  roles:
+  - helm
+
+- hosts: masters
+  become: no
+  tags:
   - mesh
   roles:
   - istio
@@ -52,3 +59,10 @@
   - chaos
   roles:
   - chaos-mesh
+
+- hosts: masters
+  become: no
+  tags:
+  - fission
+  roles:
+  - fission

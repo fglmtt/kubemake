@@ -20,6 +20,13 @@
   roles:
   - rollback/istio
 
+- hosts: masters
+  become: no
+  tags:
+  - helm
+  roles:
+  - rollback/helm
+
 - hosts: workers
   become: yes
   tags:

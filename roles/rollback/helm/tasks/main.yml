@@ -1,0 +1,16 @@
+---
+- name: Uninstall helm
+  become: yes
+  file:
+    path: /usr/local/bin/helm
+    state: absent
+
+- name: Remove helm directories and installation script
+  file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+  - $HOME/.cache/helm
+  - $HOME/.config/helm
+  - $HOME/.local/share/helm
+  - $HOME/get-helm-3.sh
