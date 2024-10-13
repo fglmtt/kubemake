@@ -1,4 +1,48 @@
 ---
+- name: Delete rabbitmq cluster
+  kubernetes.core.k8s:
+    api_version: rabbitmq.com/v1beta1
+    kind: RabbitmqCluster
+    name: rabbitmq
+    namespace: rabbitmq
+    state: absent
+
+- name: Uninstall rabbitmq
+  kubernetes.core.helm:
+    name: rabbitmq
+    namespace: rabbitmq
+    state: absent
+
+- name: Remove rabbitmq helm repository
+  kubernetes.core.helm_repository:
+    name: bitnami
+    state: absent
+
+- name: Delete rabbitmq namespace
+  kubernetes.core.k8s:
+    api_version: v1
+    kind: Namespace
+    name: rabbitmq
+    state: absent
+
+- name: Uninstall keda
+  kubernetes.core.helm:
+    name: keda
+    namespace: keda
+    state: absent
+
+- name: Remove kedacore helm repository
+  kubernetes.core.helm_repository:
+    name: kedacore
+    state: absent
+
+- name: Delete keda namespace
+  kubernetes.core.k8s:
+    api_version: v1
+    kind: Namespace
+    name: keda
+    state: absent
+
 - name: Delete cli
   become: yes
   file:
@@ -8,7 +52,7 @@
 - name: Uninstall fission
   kubernetes.core.helm:
     name: fission
-    namespace: "{{ fission_namespace }}"
+    namespace: fission
     state: absent
 
 - name: Remove helm repository
@@ -27,5 +71,5 @@
   kubernetes.core.k8s:
     api_version: v1
     kind: Namespace
-    name: "{{ fission_namespace }}"
+    name: fission
     state: absent
