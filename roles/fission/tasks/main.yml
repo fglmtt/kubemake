@@ -13,6 +13,24 @@
   - result.rc != 0
   - "'AlreadyExists' not in result.stderr"
 
+- name: Create monitoring namespace
+  kubernetes.core.k8s:
+    api_version: v1
+    kind: Namespace
+    name: fission-monitoring
+    state: present
+
+- name: Add prometheus helm repository
+  kubernetes.core.helm_repository:
+    name: prometheus-community
+    repo_url: https://prometheus-community.github.io/helm-charts
+
+- name: Install prometheus
+  kubernetes.core.helm:
+    name: prometheus
+    chart_ref: prometheus-community/kube-prometheus-stack
+    namespace: fission-monitoring
+
 - name: Add helm repository
   kubernetes.core.helm_repository:
     name: fission-charts
@@ -25,6 +43,21 @@
     namespace: fission
     chart_version: "{{ fission_version }}"
     values:
+      enableIstio: true
+      serviceMonitor:
+        enabled: true
+        namespace: fission-monitoring
+        additionalServiceMonitorLabels:
+          release: prometheus
+      podMonitor:
+        enabled: true
+        namespace: fission-monitoring
+        additionalPodMonitorLabels:
+          release: prometheus
+      grafana:
+        namespace: fission-monitoring
+        dashboards:
+          enable: true
       persistence:
         enabled: false
 
@@ -91,6 +124,7 @@
         rabbitmq:
           additionalPlugins:
           - rabbitmq_mqtt
+          - rabbitmq_management
           additionalConfig: |
             mqtt.listeners.tcp.default = 1883
             mqtt.allow_anonymous = true
