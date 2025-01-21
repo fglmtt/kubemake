@@ -1,5 +1,7 @@
 ---
-- hosts: all
+- hosts:
+  - masters
+  - workers
   become: yes
   tags:
   - setup
@@ -8,6 +10,14 @@
   - crio
   - k8s/common
   - cni
+
+- hosts: controllers
+  become: yes
+  tags:
+  - setup
+  roles:
+  - common
+  - k8s/common
 
 - hosts: gpus
   become: yes
@@ -25,6 +35,13 @@
   - flannel
   - nvidia/k8s
 
+- hosts: controllers
+  become: no
+  tags:
+  - init
+  roles:
+  - k8s/remote
+
 - hosts: workers
   become: yes
   tags:
@@ -32,7 +49,9 @@
   roles:
   - k8s/join
 
-- hosts: masters
+- hosts: 
+  - masters
+  - controllers
   become: no
   tags:
   - helm
@@ -68,3 +87,10 @@
   - serverless
   roles:
   - fission
+
+- hosts: controllers
+  become: no
+  tags:
+  - serverless
+  roles:
+  - fission/remote
