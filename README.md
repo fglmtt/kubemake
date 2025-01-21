@@ -57,12 +57,20 @@
 | Prometheus | See [here](https://github.com/istio/istio/tree/master/manifests/addons) |
 | Jaeger | See [here](https://github.com/istio/istio/tree/master/manifests/addons) |
 | Kiali | See [here](https://github.com/istio/istio/tree/master/manifests/addons) |
+| Kubernetes Metrics Server | See [here](https://github.com/kubernetes-sigs/metrics-server) |
+| kube-state-metrics | See [here](https://github.com/kubernetes/kube-state-metrics) |
 
 ### Chaos Engineering Tools
 
 | Chaos Engineering Tool | Version(s) |
 | --- | --- |
 | Chaos Mesh | 2.6.1 |
+
+### Serverless Frameworks
+
+| Serverless Framework | Version(s) |
+| --- | --- |
+| Fission | 1.20.5 |
   
 **Note 1**: the related versions are the ones that has been tested. Other versions might work as well.
   
@@ -105,14 +113,17 @@ worker-3 ansible_user=ubuntu ansible_host=192.168.1.4 kubelet_node_ip=192.168.1.
 [gpus]
 worker-3 ansible_user=ubuntu ansible_host=192.168.1.4
 
+[controllers]
+controller-1 ansible_user=ubuntu ansible_host=192.168.1.5
+
 [all:vars]
 ansible_ssh_private_key_file=/path/to/your/pem
 crio_version="1.28"
-cni_version="v1.4.0"
-kubernetes_version_repo="v1.28"
-kubernetes_os="deb"
-kubernetes_version_pkg="1.28.6-1.1"
 cri_socket="unix:/run/crio/crio.sock"
+cni_version="v1.4.0"
+kubernetes_version_repo="v1.29"
+kubernetes_os="deb"
+kubernetes_version_pkg="1.29.9-1.1"
 
 [masters:vars]
 pod_network_cidr=10.244.0.0/16
@@ -122,6 +133,10 @@ istio_version="1.20.2"
 istio_profile=demo
 istio_ingress_domain=yourdomain.edu
 chaos_mesh_version="v2.6.1"
+fission_version="v1.20.5"
+
+[controllers:vars]
+fission_version="v1.20.5"
 ```
 
 **Note 4**: for the sake of brevity, this inventory also contains variables. Please look [here](https://docs.ansible.com/ansible/2.8/user_guide/playbooks_best_practices.html) for Ansible best practices.
@@ -147,9 +162,11 @@ If you are only interested in a subset of those components, you can use [Ansible
 - `setup`: installs packages Kubernetes needs to run
 - `init`: initializes the Kubernetes master
 - `join`: makes worker nodes joining the master
+- `helm`: deploys Helm
 - `mesh`: deploys Istio
 - `telemetry`: deploys telemetry addons
 - `chaos`: deploys Chaos Mesh
+- `serverless`: deploys Fission
 
 For example, the command
 ```
