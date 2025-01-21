@@ -1,0 +1,30 @@
+- name: Copy ssh private key file
+  copy:
+    src: "{{ ansible_ssh_private_key_file }}"
+    dest: /home/{{ ansible_user }}/.ssh/cluster.pem
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: "0600"
+
+- name: Create ~/.kube directory
+  file:
+    path: /home/{{ ansible_user }}/.kube
+    state: directory
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: "0700"
+
+- name: Synchronize kubeconfig file
+  synchronize:
+    src: "{{ hostvars[groups['masters'][0]]['ansible_user'] }}@{{ hostvars[groups['masters'][0]]['ansible_host'] }}:~/.kube/config"
+    dest: /home/{{ ansible_user }}/.kube/config
+    private_key: /home/{{ ansible_user }}/.ssh/cluster.pem
+    mode: pull
+  delegate_to: "{{ groups['controllers'][0] }}"
+
+- name: Secure kubeconfig file
+  file:
+    path: /home/{{ ansible_user }}/.kube/config
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: "0600"
