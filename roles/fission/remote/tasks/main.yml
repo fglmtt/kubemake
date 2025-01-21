@@ -1,0 +1,7 @@
+---
+- name: Install cli
+  become: yes
+  get_url:
+    url: 'https://github.com/fission/fission/releases/download/{{ fission_version }}/fission-{{ fission_version }}-linux-{{ cni_arch }}'
+    dest: '/usr/local/bin/fission'
+    mode: '0755'
