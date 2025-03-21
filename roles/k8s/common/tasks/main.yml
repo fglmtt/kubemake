@@ -1,28 +1,35 @@
 ---
 # https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/
-- name: Disable swap
+- name: disable swap
   shell: swapoff -a
 
-- name: Download k8s public signing key
-  apt_key:
-    url: https://pkgs.k8s.io/core:/stable:/{{kubernetes_version_repo}}/{{kubernetes_os}}/Release.key
-    keyring: /usr/share/keyrings/kubernetes-archive-keyring.gpg
+- name: download kubernetes repository key
+  get_url:
+    url: "https://pkgs.k8s.io/core:/stable:/{{ kubernetes_version }}/{{ kubernetes_os }}/Release.key"
+    dest: /tmp/kubernetes-release.key
 
-- name: Add k8s apt repository
-  apt_repository:
-    repo: |
-      deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] 
-      https://pkgs.k8s.io/core:/stable:/{{kubernetes_version_repo}}/{{kubernetes_os}}/ /
-    filename: kubernetes
-    state: present
+# otherwide next task will prompt for confirmation
+- name: make sure kubernetes repository key does not already exists
+  file:
+    path: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+    state: absent
 
-- name: Install kubelet, kubeadm, and kubectl
+- name: add kubernetes repository key to apt keyring
+  shell: gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg /tmp/kubernetes-release.key
+
+- name: add kubernetes repository to sources list
+  lineinfile:
+    path: /etc/apt/sources.list.d/kubernetes.list
+    line: "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/{{ kubernetes_version }}/{{ kubernetes_os }}/ /"
+    create: yes
+
+- name: install kubelet, kubeadm, and kubectl
   apt:
     name: "{{ packages }}"
     state: present
     update_cache: yes
   vars:
     packages:
-    - kubelet={{ kubernetes_version_pkg }}
-    - kubeadm={{ kubernetes_version_pkg }}
-    - kubectl={{ kubernetes_version_pkg }}
+    - kubelet
+    - kubeadm
+    - kubectl

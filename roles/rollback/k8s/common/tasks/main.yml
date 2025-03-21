@@ -1,5 +1,5 @@
 ---
-- name: Uninstall kubelet, kubeadm, and kubectl
+- name: uninstall kubelet, kubeadm, and kubectl
   apt:
     name: "{{ packages }}"
     state: absent
@@ -9,18 +9,20 @@
     - kubeadm
     - kubectl
 
-- name: Remove k8s apt repository
-  apt_repository:
-    repo: |
-      deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] 
-      https://pkgs.k8s.io/core:/stable:/{{kubernetes_version_repo}}/{{kubernetes_os}}/ /
-    filename: kubernetes
-    state: absent
-
-- name: Delete k8s public signing key
+- name: delete kubernetes repository to sources list
   file:
-    path: /usr/share/keyrings/kubernetes-archive-keyring.gpg
+    path: /etc/apt/sources.list.d/kubernetes.list
     state: absent
 
-- name: Enable swap
+- name: delete kubernetes repository key to apt keyring
+  file:
+    path: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+    state: absent
+
+- name: delete kubernetes repository key
+  file:
+    path: /tmp/kubernetes-release.key
+    state: absent
+
+- name: enable swap
   shell: swapon -a
