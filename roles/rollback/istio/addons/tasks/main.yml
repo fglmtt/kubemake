@@ -1,5 +1,5 @@
 ---
-- name: Delete gateways and virtual services to access addons remotely
+- name: delete gateways and virtual services to access addons remotely
   kubernetes.core.k8s:
     src: $HOME/{{ item }}.yaml
     state: absent
@@ -9,7 +9,7 @@
   - kiali
   - prometheus
 
-- name: Delete config files to access addons remotely
+- name: delete config files to access addons remotely
   file:
     path: $HOME/{{ item }}.yaml
     state: absent
@@ -19,7 +19,7 @@
   - kiali
   - prometheus
 
-- name: Delete telemetry addons to the cluster
+- name: delete telemetry addons from the cluster
   kubernetes.core.k8s:
     src: $HOME/istio-{{ istio_version }}/samples/addons/{{ item }}.yaml
     state: absent
