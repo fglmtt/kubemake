@@ -1,18 +1,21 @@
 ---
 - name: uninstall nvidia device plugin
+  become: no
   kubernetes.core.helm:
     name: nvidia-device-plugin
     chart_ref: nvdp/nvidia-device-plugin
     namespace: nvidia-device-plugin
     state: absent
 
-- name: remove nvidia device plugin namespace
+- name: delete nvidia device plugin namespace
+  become: no
   kubernetes.core.k8s:
     name: nvidia-device-plugin
     kind: Namespace
     state: absent
 
-- name: remove nvidia device plugin helm repository
+- name: delete nvidia device plugin helm repository
+  become: no
   kubernetes.core.helm_repository:
     name: nvdp
     state: absent

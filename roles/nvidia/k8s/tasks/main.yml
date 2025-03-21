@@ -1,11 +1,13 @@
 ---
 # https://github.com/NVIDIA/k8s-device-plugin?tab=readme-ov-file#deployment-via-helm
 - name: add nvidia device plugin helm repository
+  become: no
   kubernetes.core.helm_repository:
     name: nvdp
     repo_url: https://nvidia.github.io/k8s-device-plugin
 
 - name: install nvidia device plugin
+  become: no
   kubernetes.core.helm:
     name: nvidia-device-plugin
     chart_ref: nvdp/nvidia-device-plugin
