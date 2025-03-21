@@ -1,14 +1,15 @@
 ---
-# https://github.com/NVIDIA/k8s-device-plugin
-- name: Download nvidia device plugin manifest
-  become: no
-  get_url:
-    url: https://raw.githubusercontent.com/NVIDIA/k8s-device-plugin/{{ nvidia_device_plugin_version }}/nvidia-device-plugin.yml
-    dest: $HOME/nvidia-device-plugin.yml
+# https://github.com/NVIDIA/k8s-device-plugin?tab=readme-ov-file#deployment-via-helm
+- name: add nvidia device plugin helm repository
+  kubernetes.core.helm_repository:
+    name: nvdp
+    repo_url: https://nvidia.github.io/k8s-device-plugin
 
-- name: Deploy nvidia device plugin to the cluster
-  become: no
-  kubernetes.core.k8s:
-    src: $HOME/nvidia-device-plugin.yml
-    state: present
-
+- name: install nvidia device plugin
+  kubernetes.core.helm:
+    name: nvidia-device-plugin
+    chart_ref: nvdp/nvidia-device-plugin
+    namespace: nvidia-device-plugin
+    create_namespace: yes
+    chart_version: "{{ nvidia_device_plugin_version }}"
+    update_repo_cache: yes
