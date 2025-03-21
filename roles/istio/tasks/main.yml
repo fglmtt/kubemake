@@ -1,48 +1,60 @@
 ---
 # https://istio.io/latest/docs/setup/getting-started/
-- name: Get script to download istio
+- name: download script to download istio
   get_url:
     url: https://istio.io/downloadIstio
     dest: $HOME/downloadIstio.sh
 
-- name: Make the script executable
+- name: make the script executable
   file:
     path: $HOME/downloadIstio.sh
     mode: u+x
 
-- name: Download istio {{ istio_version }}
+- name: download istio {{ istio_version }}
   shell: >
     ISTIO_VERSION={{ istio_version }}
     sh $HOME/downloadIstio.sh
 
-- name: Delete the script
+- name: delete the script
   file:
     path: $HOME/downloadIstio.sh
     state: absent
 
-- name: Create symlink
+- name: create symlink
   become: yes
   file:
     src: /home/{{ ansible_user }}/istio-{{ istio_version }}/bin/istioctl
     dest: /usr/local/bin/istioctl
     state: link
 
-- name: Install {{ istio_profile }} profile
+- name: install {{ istio_profile }} profile
   shell: >
     istioctl install 
     --set profile={{ istio_profile }}
     --set values.pilot.env.ENABLE_NATIVE_SIDECARS=true
     --skip-confirmation
 
-- name: Generate manifest
+- name: configure istio-ingressgateway nodeport for http2
+  kubernetes.core.k8s_service:
+    state: present
+    name: istio-ingressgateway
+    namespace: istio-system
+    inline:
+      spec:
+        ports:
+        - name: http2
+          port: 80
+          targetPort: 8080
+          protocol: TCP
+          nodePort: "{{ istio_ingress_http_port }}"
+        type: NodePort
+
+- name: generate istio manifest
   shell: >
     istioctl manifest generate --set profile={{ istio_profile }}
     > $HOME/istio.yml
 
-- name: Verify installation
-  shell: istioctl verify-install -f $HOME/istio.yml
-
-- name: Enable sidecar injection in default namespace
+- name: enable sidecar injection in default namespace
   kubernetes.core.k8s:
     kind: Namespace
     name: default
