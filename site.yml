@@ -32,8 +32,8 @@
   - init
   roles:
   - k8s/init
-  - flannel
   - helm
+  - flannel
   - nvidia/k8s
 
 - hosts: controllers
