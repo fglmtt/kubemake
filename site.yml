@@ -33,6 +33,7 @@
   roles:
   - k8s/init
   - flannel
+  - helm
   - nvidia/k8s
 
 - hosts: controllers
@@ -41,6 +42,7 @@
   - init
   roles:
   - k8s/remote
+  - helm
 
 - hosts: workers
   become: yes
@@ -48,15 +50,6 @@
   - join
   roles:
   - k8s/join
-
-- hosts: 
-  - masters
-  - controllers
-  become: no
-  tags:
-  - helm
-  roles:
-  - helm
 
 - hosts: masters
   become: no
