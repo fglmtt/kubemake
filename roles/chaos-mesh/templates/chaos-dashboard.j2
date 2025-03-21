@@ -2,7 +2,7 @@ apiVersion: networking.istio.io/v1alpha3
 kind: Gateway
 metadata:
   name: chaos-dashboard-gateway
-  namespace: chaos-testing
+  namespace: chaos-mesh
 spec:
   selector:
     istio: ingressgateway
@@ -18,7 +18,7 @@ apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
   name: chaos-dashboard-vs
-  namespace: chaos-testing
+  namespace: chaos-mesh
 spec:
   hosts:
   - "chaos.{{ istio_ingress_domain }}"
@@ -35,7 +35,7 @@ apiVersion: networking.istio.io/v1alpha3
 kind: DestinationRule
 metadata:
   name: chaos-dashboard
-  namespace: chaos-testing
+  namespace: chaos-mesh
 spec:
   host: chaos-dashboard
   trafficPolicy:

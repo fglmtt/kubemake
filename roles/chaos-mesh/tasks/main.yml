@@ -1,21 +1,22 @@
 ---
-- name: Add chaos-mesh repository
+# https://chaos-mesh.org/docs/production-installation-using-helm/
+- name: add chaos mesh helm repository
   kubernetes.core.helm_repository:
     name: chaos-mesh
     repo_url: "https://charts.chaos-mesh.org"
 
-- name: Create chaos-testing namespace
+- name: create chaos-mesh namespace
   kubernetes.core.k8s:
     api_version: v1
     kind: Namespace
-    name: chaos-testing
+    name: chaos-mesh
     state: present
 
-- name: Install chaos-mesh
+- name: install chaos mesh
   kubernetes.core.helm:
     name: chaos-mesh
     chart_ref: chaos-mesh/chaos-mesh
-    release_namespace: chaos-testing
+    release_namespace: chaos-mesh
     values:
       chaosDaemon:
         runtime: crio
@@ -24,7 +25,7 @@
         enableFilterNamespace: true
       version: "{{ chaos_mesh_version }}"
 
-- name: Enable chaos-mesh in default namespace
+- name: enable chaos mesh in default namespace
   kubernetes.core.k8s:
     kind: Namespace
     name: default
@@ -34,22 +35,22 @@
           chaos-mesh.org/inject: enabled
     state: patched
   
-- name: Render template to access chaos dashboard remotely
+- name: render template to access chaos dashboard remotely
   template:
     src: chaos-dashboard.j2
     dest: $HOME/chaos-dashboard.yaml
 
-- name: Deploy gateway and virtual service to access chaos dashboard remotely
+- name: create gateway and virtual service to access chaos dashboard remotely
   kubernetes.core.k8s:
     src: $HOME/chaos-dashboard.yaml
     state: present
 
-- name: Copy rbac for manager profile in default namespace
+- name: copy rbac for manager profile in default namespace
   copy:
     src: chaos-rbac.yaml
     dest: $HOME/chaos-rbac.yaml
 
-- name: Create manager profile in default namespace
+- name: create manager profile in default namespace
   kubernetes.core.k8s:
     src: $HOME/chaos-rbac.yaml
     state: present
