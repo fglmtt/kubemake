@@ -1,17 +1,27 @@
 ---
-- name: Delete flannel
+- name: uninstall flannel
+  become: no
+  kubernetes.core.helm:
+    name: flannel
+    chart_ref: flannel/flannel
+    namespace: flannel
+    state: absent
+
+- name: delete flannel helm repository
+  become: no
+  kubernetes.core.helm_repository:
+    name: flannel
+    state: absent
+
+- name: delete flannel namespace
   become: no
   kubernetes.core.k8s:
-    src: $HOME/flannel.yml
+    name: flannel
+    api_version: v1
+    kind: Namespace
     state: absent
 
-- name: Delete flannel manifest
-  become: no
-  file:
-    path: $HOME/flannel.yml
-    state: absent
-
-- name: Delete flannel.1 interface
+- name: delete flannel.1 interface
   shell: ip link delete flannel.1
   register: del_flannel
   failed_when:
@@ -20,7 +30,7 @@
   changed_when:
   - del_flannel.rc == 0
 
-- name: Delete cni0 bridge
+- name: delete cni0 bridge
   shell: ip link delete cni0 type bridge
   register: del_cni
   failed_when:
@@ -29,7 +39,7 @@
   changed_when:
   - del_cni.rc == 0
 
-- name: Delete /run/flannel/
+- name: delete /run/flannel
   file:
     path: /run/flannel
     state: absent
