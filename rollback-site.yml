@@ -50,6 +50,7 @@
   roles:
   - rollback/nvidia/k8s
   - rollback/flannel
+  - rollback/helm
   - rollback/k8s/init
 
 - hosts: gpus
