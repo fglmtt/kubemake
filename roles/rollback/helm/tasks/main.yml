@@ -5,7 +5,7 @@
     path: /usr/local/bin/helm
     state: absent
 
-- name: remove helm directories and installation script
+- name: delete helm directories and installation script
   file:
     path: "{{ item }}"
     state: absent
