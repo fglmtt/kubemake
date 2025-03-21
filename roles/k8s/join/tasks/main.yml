@@ -1,10 +1,10 @@
 ---
-- name: Create join command
+- name: create join command
   shell: kubeadm token create --print-join-command
   register: join_cmd
   delegate_to: "{{ groups['masters'][0] }}"
 
-- name: Ensure node has not joined yet
+- name: ensure node has not joined yet
   become: no
   kubernetes.core.k8s_info:
     kind: Node
@@ -12,14 +12,14 @@
   register: k8s_node
   delegate_to: "{{ groups['masters'][0] }}"
 
-- name: Join cluster
+- name: join cluster
   block:
   - name: Run join command
     shell: "{{ join_cmd.stdout_lines[0] }} --cri-socket={{ cri_socket }}"
     when:
     - k8s_node.resources == []
 
-  - name: Check if node joined
+  - name: check if node has joined
     become: no
     kubernetes.core.k8s_info:
       kind: Node
@@ -31,7 +31,7 @@
     retries: 60
     delay: 5
 
-  - name: Check if status node is ready
+  - name: check if status node is ready
     become: no
     kubernetes.core.k8s_info:
       kind: Node
@@ -43,13 +43,13 @@
         type: "Ready"
     delegate_to: "{{ groups['masters'][0] }}"
 
-- name: Create /etc/default/kubelet to set --node-ip
+- name: set --node-ip in /etc/default/kubelet
   lineinfile:
     path: /etc/default/kubelet
     line: KUBELET_EXTRA_ARGS=--node-ip={{ kubelet_node_ip }}
     create: true
 
-- name: Restart service kubelet
+- name: restart kubelet service
   systemd:
     daemon_reload: yes
     name: kubelet

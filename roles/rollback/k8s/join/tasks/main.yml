@@ -1,5 +1,5 @@
 ---
-- name: Drain node
+- name: drain node
   become: no
   shell: >
     kubectl drain {{ hostvars[inventory_hostname]['ansible_hostname'] }}
@@ -8,25 +8,25 @@
     --ignore-daemonsets
   delegate_to: "{{ groups['masters'][0] }}"
 
-- name: Reset worker node
+- name: reset worker node
   shell: >
     kubeadm reset
     --cri-socket={{ cri_socket }}
     --force
 
-- name: Reset iptables
+- name: reset iptables
   shell: |
     iptables -F
     iptables -t nat -F
     iptables -t mangle -F
     iptables -X
 
-- name: Delete /etc/default/kubelet
+- name: delete /etc/default/kubelet
   file:
     path: /etc/default/kubelet
     state: absent
 
-- name: Delete node
+- name: delete node
   become: no
   kubernetes.core.k8s:
     kind: Node
@@ -34,7 +34,7 @@
     state: absent
   delegate_to: "{{ groups['masters'][0] }}"
 
-- name: Delete flannel.1 interface
+- name: delete flannel.1 interface
   shell: ip link delete flannel.1
   register: del_flannel
   failed_when:
@@ -43,7 +43,7 @@
   changed_when:
   - del_flannel.rc == 0
 
-- name: Delete cni0 bridge
+- name: delete cni0 bridge
   shell: ip link delete cni0 type bridge
   register: del_cni
   failed_when:
@@ -52,7 +52,7 @@
   changed_when:
   - del_cni.rc == 0
 
-- name: Delete /run/flannel/
+- name: delete /run/flannel
   file:
     path: /run/flannel
     state: absent
