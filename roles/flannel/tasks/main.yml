@@ -9,6 +9,7 @@
     state: present
 
 - name: add label to flannel namespace to set pod security policy
+  become: no
   kubernetes.core.k8s:
     state: patched
     kind: Namespace
@@ -34,4 +35,6 @@
     values:
       flannel:
         args:
+        - "--ip-masq"
+        - "--kube-subnet-mgr"
         - "--iface-regex={{ flannel_iface_regex }}"
