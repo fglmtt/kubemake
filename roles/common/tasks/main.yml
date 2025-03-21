@@ -1,7 +1,7 @@
 ---
 # https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#installing-kubeadm-kubelet-and-kubectl
 # apt-transort-https, ca-certificas, gpg, and curl
-# (2) https://github.com/cri-o/packaging/blob/main/README.md#install-the-dependencies-for-adding-repositories
+# https://github.com/cri-o/packaging/blob/main/README.md#install-the-dependencies-for-adding-repositories
 # curl and software-properties-common
 - name: install packages needed to use custom apt repositories
   apt:
