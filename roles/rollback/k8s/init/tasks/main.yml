@@ -1,36 +1,36 @@
 ---
-- name: Reset the control plane node
+- name: reset control plane
   shell: >
     kubeadm reset
     --cri-socket={{ cri_socket }}
     --force
 
-- name: Reset iptables
+- name: reset iptables
   shell: |
     iptables -F
     iptables -t nat -F
     iptables -t mangle -F
     iptables -X
 
-- name: Delete /etc/default/kubelet
+- name: delete /etc/default/kubelet
   file:
     path: /etc/default/kubelet
     state: absent
 
-- name: Delete ~/.kube/directory
+- name: delete ~/.kube/directory
   become: no
   file:
     path: $HOME/.kube
     state: absent
 
-- name: Uninstall packages needed to use community.kubernetes collection
+- name: uninstall packages needed to use community.kubernetes collection
   block:
-  - name: Uninstall openshift Python package
+  - name: uninstall openshift python package
     pip:
       name: openshift
       state: absent
 
-  - name: Uninstall python3-pip
+  - name: uninstall python3-pip
     apt:
       name: python3-pip
       state: absent

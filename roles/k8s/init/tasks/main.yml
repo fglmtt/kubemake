@@ -1,21 +1,21 @@
 ---
-- name: Install packages needed to use community.kubernetes collection
+- name: install packages to use community.kubernetes collection
   block:
-  - name: Install python3-pip
+  - name: install python3-pip
     apt:
       name: python3-pip
       state: present
       update_cache: yes
 
-  - name: Install openshift Python package
+  - name: install openshift python package
     pip:
       name: openshift
       state: present
 
-- name: Populate service facts
+- name: populate service facts
   service_facts:
 
-- name: Ensure kubelet is not running
+- name: ensure kubelet is not running
   service_facts:
   until:
   - ansible_facts['services']['kubelet.service']['state'] != 'running'
@@ -24,7 +24,7 @@
   failed_when: false
 
 # https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/
-- name: Initialize the k8s cluster
+- name: initialize control plane
   shell: >
     kubeadm init 
     --apiserver-advertise-address={{ apiserver_advertise_address }} 
@@ -34,13 +34,13 @@
   when:
   - ansible_facts['services']['kubelet.service']['state'] != 'running'
 
-- name: Create ~/.kube directory
+- name: create ~/.kube directory
   become: no
   file:
     path: $HOME/.kube
     state: directory
 
-- name: Copy k8s config file in ~/.kube
+- name: copy /etc/kubernetes/admin.conf in ~/.kube
   copy:
     src: /etc/kubernetes/admin.conf
     remote_src: yes
@@ -48,13 +48,13 @@
     owner: "{{ ansible_user }}"
     group: "{{ ansible_user }}"
 
-- name: Create /etc/default/kubelet to set --node-ip
+- name: set --node-ip in /etc/default/kubelet
   lineinfile:
     path: /etc/default/kubelet
     line: KUBELET_EXTRA_ARGS=--node-ip={{ kubelet_node_ip }}
     create: true
 
-- name: Restart service kubelet
+- name: restart kubelet service
   systemd:
     daemon_reload: yes
     name: kubelet
