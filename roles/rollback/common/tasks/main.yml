@@ -4,10 +4,8 @@
     path: /etc/sysctl.d/k8s.conf
     state: absent
 
-- name: reload sysctl
-  ansible.builtin.command:
-    cmd: sysctl --system
-  become: yes
+- name: reload system kernel parameters
+  shell: sysctl --system
 
 - name: uninstall packages needed to use the custom apt repositories
   apt:
