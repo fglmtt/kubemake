@@ -9,17 +9,17 @@
     - kubeadm
     - kubectl
 
-- name: delete kubernetes repository to sources list
+- name: delete /etc/apt/sources.list.d/kubernetes.list
   file:
     path: /etc/apt/sources.list.d/kubernetes.list
     state: absent
 
-- name: delete kubernetes repository key to apt keyring
+- name: delete /etc/apt/keyrings/kubernetes-apt-keyring.gpg
   file:
     path: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
     state: absent
 
-- name: delete kubernetes repository key
+- name: delete /tmp/kubernetes-release.key
   file:
     path: /tmp/kubernetes-release.key
     state: absent

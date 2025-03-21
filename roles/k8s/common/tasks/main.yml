@@ -9,7 +9,7 @@
     dest: /tmp/kubernetes-release.key
 
 # otherwide next task will prompt for confirmation
-- name: make sure kubernetes repository key does not already exists
+- name: make sure kubernetes repository key does not already exist
   file:
     path: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
     state: absent

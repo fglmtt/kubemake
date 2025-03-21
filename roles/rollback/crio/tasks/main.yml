@@ -11,17 +11,17 @@
   systemd_service:
     daemon_reload: true
 
-- name: delete cri-o repository from sources list
+- name: delete /etc/apt/sources.list.d/cri-o.list
   file:
     path: /etc/apt/sources.list.d/cri-o.list
     state: absent
 
-- name: delete cri-o repository key from apt keyring
+- name: delete /etc/apt/keyrings/cri-o-apt-keyring.gpg
   file:
     path: /etc/apt/keyrings/cri-o-apt-keyring.gpg
     state: absent
 
-- name: delete cri-o repository key
+- name: delete /tmp/crio-release.key
   file:
     path: /tmp/crio-release.key
     state: absent

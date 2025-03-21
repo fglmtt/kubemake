@@ -27,7 +27,7 @@
     dest: /tmp/crio-release.key
 
 # otherwide next task will prompt for confirmation
-- name: make sure cri-o repository key does not already exists
+- name: make sure cri-o repository key does not already exist
   file:
     path: /etc/apt/keyrings/cri-o-apt-keyring.gpg
     state: absent
