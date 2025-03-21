@@ -1,10 +1,11 @@
 ---
-- name: Add metrics-server repository
+# https://artifacthub.io/packages/helm/metrics-server/metrics-server
+- name: add metrics-server repository
   kubernetes.core.helm_repository:
     name: metrics-server
     repo_url: "https://kubernetes-sigs.github.io/metrics-server"
 
-- name: Install metrics-server
+- name: install metrics-server
   kubernetes.core.helm:
     name: metrics-server
     release_namespace: kube-system
