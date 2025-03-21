@@ -23,7 +23,7 @@
 
 - name: download cri-o repository key
   get_url:
-    url: "https://download.opensuse.org/repositories/isv:/cri-o:/stable:/{{ crio_version }}/deb/Release.key"
+    url: "https://download.opensuse.org/repositories/isv:/cri-o:/stable:/{{ crio_version }}/{{ crio_os }}/Release.key"
     dest: /tmp/crio-release.key
 
 # otherwide next task will prompt for confirmation
@@ -38,7 +38,7 @@
 - name: add cri-o repository to sources list
   lineinfile:
     path: /etc/apt/sources.list.d/cri-o.list
-    line: "deb [signed-by=/etc/apt/keyrings/cri-o-apt-keyring.gpg] https://download.opensuse.org/repositories/isv:/cri-o:/stable:/{{ crio_version }}/deb/ /"
+    line: "deb [signed-by=/etc/apt/keyrings/cri-o-apt-keyring.gpg] https://download.opensuse.org/repositories/isv:/cri-o:/stable:/{{ crio_version }}/{{ crio_os }}/ /"
     create: yes
 
 # this is to avoid cri-o installation conflicts (see next task)
