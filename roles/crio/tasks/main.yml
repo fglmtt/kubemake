@@ -1,57 +1,53 @@
 ---
-# https://kubernetes.io/docs/setup/production-environment/container-runtimes/
-- name: Add crio configuration file to /etc/modules-load.d/
+# https://github.com/cri-o/packaging/blob/main/README.md#install-the-dependencies-for-adding-repositories
+- name: add crio configuration file to /etc/modules-load.d/
   copy:
     src: modules-load.conf
     dest: /etc/modules-load.d/crio.conf
     owner: root
     group: root
 
-- name: Ensure br_netfilter module is loaded
+- name: ensure br_netfilter module is loaded
   shell: modprobe br_netfilter
 
-- name: Ensure overlay module is loaded
-  shell: modprobe overlay
-
-- name: Ensure iptables works properly
+# this is not required anymore for the latest versions of cri-o
+- name: ensure iptables works properly
   copy:
     src: iptables.conf
     dest: /etc/sysctl.d/99-kubernetes-cri.conf
     owner: root
     group: root
 
-- name: Force sysctl to load settings from all system conf files
+- name: reload system kernel parameters
   shell: sysctl --system
 
-# https://github.com/cri-o/cri-o/blob/main/install.md#apt-based-operating-systems
-# https://github.com/cri-o/cri-o/blob/main/tutorials/kubernetes.md
-- name: Download libcontainers public signing key
-  apt_key:
-    url: https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/{{crio_os}}/Release.key
-    keyring: /usr/share/keyrings/libcontainers-archive-keyring.gpg
+- name: download cri-o repository key
+  get_url:
+    url: "https://download.opensuse.org/repositories/isv:/cri-o:/stable:/{{ crio_version }}/deb/Release.key"
+    dest: /tmp/crio-release.key
 
-- name: Download libcontainers-cri-o public signing key
-  apt_key:
-    url: https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/{{ crio_version }}/{{ crio_os }}/Release.key
-    keyring: /usr/share/keyrings/libcontainers-crio-archive-keyring.gpg
+# otherwide next task will prompt for confirmation
+- name: make sure cri-o repository key does not already exists
+  file:
+    path: /etc/apt/keyrings/cri-o-apt-keyring.gpg
+    state: absent
 
-- name: Add libcontainers apt repository
-  apt_repository:
-    repo: |
-      deb [signed-by=/usr/share/keyrings/libcontainers-archive-keyring.gpg]
-      https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/{{ crio_os }}/ /
-    filename: devel:kubic:libcontainers:stable
-    state: present
+- name: add cri-o repository key to apt keyring
+  shell: gpg --dearmor -o /etc/apt/keyrings/cri-o-apt-keyring.gpg /tmp/crio-release.key
 
-- name: Add libcontainers-cri-o apt repository
-  apt_repository:
-    repo: |
-      deb [signed-by=/usr/share/keyrings/libcontainers-crio-archive-keyring.gpg]
-      http://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/{{ crio_version }}/{{ crio_os }}/ /
-    filename: devel:kubic:libcontainers:stable:cri-o:{{ crio_version }}
-    state: present
+- name: add cri-o repository to sources list
+  lineinfile:
+    path: /etc/apt/sources.list.d/cri-o.list
+    line: "deb [signed-by=/etc/apt/keyrings/cri-o-apt-keyring.gpg] https://download.opensuse.org/repositories/isv:/cri-o:/stable:/{{ crio_version }}/deb/ /"
+    create: yes
 
-- name: Install cri-o and cri-o-runc
+# this is to avoid cri-o installation conflicts (see next task)
+- name: uninstall conmon
+  apt:
+    name: conmon
+    state: absent
+
+- name: install cri-o
   apt:
     name: "{{ packages }}"
     state: present
@@ -59,13 +55,12 @@
   vars:
     packages:
     - cri-o
-    - cri-o-runc
 
-- name: Daemon reload
+- name: reload system unit files
   systemd_service:
     daemon_reload: true
 
-- name: Enable and start cri-o
+- name: enable and start cri-o service
   systemd_service:
     name: crio
     enabled: true

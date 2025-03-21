@@ -1,54 +1,40 @@
 ---
-- name: Uninstall cri-o and cri-o-runc
+- name: uninstall cri-o
   apt:
     name: "{{ packages }}"
     state: absent
   vars:
     packages:
     - cri-o
-    - cri-o-runc
 
-- name: Remove libcontainers-cri-o apt repository
-  apt_repository:
-    repo: |
-      deb [signed-by=/usr/share/keyrings/libcontainers-crio-archive-keyring.gpg]
-      http://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable:/cri-o:/{{ crio_version }}/{{ crio_os }}/ /
-    filename: devel:kubic:libcontainers:stable:cri-o:{{ crio_version }}
-    state: absent
+- name: reload system unit files
+  systemd_service:
+    daemon_reload: true
 
-- name: Remove libcontainers apt repository
-  apt_repository:
-    repo: |
-      deb [signed-by=/usr/share/keyrings/libcontainers-archive-keyring.gpg]
-      https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/{{ crio_os }}/ /
-    filename: devel:kubic:libcontainers:stable
-    state: absent
-
-- name: Delete libcontainers-cri-o public signing key
+- name: delete cri-o repository from sources list
   file:
-    path: /usr/share/keyrings/libcontainers-crio-archive-keyring.gpg
+    path: /etc/apt/sources.list.d/cri-o.list
     state: absent
 
-- name: Delete libcontainers public signing key
+- name: delete cri-o repository key from apt keyring
   file:
-    path: /usr/share/keyrings/libcontainers-archive-keyring.gpg
+    path: /etc/apt/keyrings/cri-o-apt-keyring.gpg
     state: absent
 
-- name: Delete /etc/sysctl.d/99-kubernetes-cri.conf
+- name: delete cri-o repository key
+  file:
+    path: /tmp/crio-release.key
+    state: absent
+
+- name: delete /etc/sysctl.d/99-kubernetes-cri.conf
   file:
     path: /etc/sysctl.d/99-kubernetes-cri.conf
     state: absent
 
-- name: Delete /etc/modules-load.d/crio.conf
+- name: delete /etc/modules-load.d/crio.conf
   file:
     path: /etc/modules-load.d/crio.conf
     state: absent
 
-- name: Unload br_netfilter module
-  shell: modprobe -r br_netfilter
-
-- name: Unload overlay module
-  shell: modprobe -r overlay
-
-- name: Force sysctl to load settings from all system conf files
+- name: reload system kernel parameters
   shell: sysctl --system
