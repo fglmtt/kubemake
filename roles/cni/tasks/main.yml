@@ -21,12 +21,15 @@
     path: $HOME/cni-plugins-linux-{{ cni_arch }}-{{ cni_version }}.tgz
     state: absent
 
-- name: restart service crio
+# skip this for gpus group
+# cri-o will be properly configured in the nvidia/crio role for gpus group
+- name: restart cri-o service
   systemd_service:
     name: crio
     state: restarted
+  when: "'gpus' not in group_names"
 
-- name: restart service kubelet
+- name: restart kubelet service
   systemd_service:
     name: kubelet
     state: restarted
