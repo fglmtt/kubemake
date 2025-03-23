@@ -50,6 +50,18 @@
         status: "True"
         type: "Ready"
     delegate_to: "{{ groups['masters'][0] }}"
+  
+- name: add label for gpus
+  become: no
+  kubernetes.core.k8s:
+    kind: Node
+    name: "{{ ansible_hostname }}"
+    definition:
+      metadata:
+        labels:
+          nvidia.com/gpu.present: "true"
+  when: "'gpus' in group_names"
+  delegate_to: "{{ groups['masters'][0] }}"
 
 - name: set --node-ip in /etc/default/kubelet
   lineinfile:
