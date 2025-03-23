@@ -1,43 +1,68 @@
 ---
 # https://github.com/NVIDIA/k8s-device-plugin
-- name: Download libnvidia-container public signing key
-  apt_key:
+# https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html
+- name: dowload nvidia-container-toolkit repository key
+  get_url:
     url: https://nvidia.github.io/libnvidia-container/gpgkey
-    keyring: /usr/share/keyrings/libnvidia-container-keyring.gpg
+    dest: /tmp/libnvidia-container-keyring.gpg
 
-- name: Add libnvidia-container apt repository
-  apt_repository:
-    repo: |
-      deb [signed-by=/usr/share/keyrings/libnvidia-container-keyring.gpg]
-       https://nvidia.github.io/libnvidia-container/stable/deb/$(ARCH)/ /
-    filename: libnvidia-container
-    state: present
+# otherwide next task will prompt for confirmation
+- name: make sure nvidia-container-toolkit repository key does not already exist
+  file:
+    path: /usr/share/keyrings/libnvidia-container-keyring.gpg
+    state: absent
+
+- name: add nvidia-container-toolkit repository key to apt keyring
+  shell: gpg --dearmor -o /usr/share/keyrings/libnvidia-container-keyring.gpg /tmp/libnvidia-container-keyring.gpg
+
+- name: add nvidia-container-toolkit repository to sources list
+  lineinfile:
+    path: /etc/apt/sources.list.d/libnvidia-container-toolkit.list
+    line: "deb [signed-by=/usr/share/keyrings/libnvidia-container-keyring.gpg] https://nvidia.github.io/libnvidia-container/stable/deb/$(ARCH) /"
+    create: yes
 
 # crio runtime issues with prior versions, thus >= 1.14
-- name: Install nvidia-container-toolkit
+- name: install nvidia-container-toolkit
   apt:
     name: "{{ packages }}"
     update_cache: true
     state: present
   vars:
     packages:
-    - nvidia-container-toolkit-base>=1.14
-    - nvidia-container-toolkit>=1.14
+    - nvidia-container-toolkit
 
-- name: Set nvidia-container-runtime as the default low-level OCI runtime
+# https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html#configuring-cri-o
+# https://github.com/NVIDIA/k8s-device-plugin?tab=readme-ov-file#notes-on-cri-o-configuration
+- name: set nvidia-container-runtime as the default low-level oci runtime
   shell: >
     nvidia-ctk runtime configure 
     --runtime=crio 
     --set-as-default 
     --config=/etc/crio/crio.conf.d/99-nvidia.conf
 
-- name: Add crun to the list of runtimes
+- name: add crun to the list of runtimes
   lineinfile:
     path: /etc/nvidia-container-runtime/config.toml
     regexp: '^runtimes ='
     line: 'runtimes = ["crun", "docker-runc", "runc"]'
 
-- name: Restart crio
+- name: install conmon
+  apt:
+    name: "{{ packages }}"
+    state: present
+    update_cache: yes
+  vars:
+    packages:
+    - conmon
+
+- name: create symlink for /usr/libexec/crio/conmon in /usr/bin
+  file:
+    src: /usr/libexec/crio/conmon
+    dest: /usr/bin/conmon
+    state: link
+    force: yes
+
+- name: restart cri-o service
   systemd_service:
     name: crio
     state: restarted

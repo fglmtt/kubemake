@@ -1,38 +1,47 @@
 ---
-- name: Remove crun to the list of runtimes
+- name: remove /usr/bin/conmon symlink
+  file:
+    path: /usr/bin/conmon
+    state: absent
+
+- name: uninstall conmon
+  apt:
+    name: "{{ packages }}"
+    state: absent
+  vars:
+    packages:
+    - conmon
+
+- name: remove crun to the list of runtimes
   lineinfile:
     path: /etc/nvidia-container-runtime/config.toml
     regexp: '^runtimes ='
     line: 'runtimes = ["docker-runc", "runc"]'
 
-- name: Unset nvidia-container-runtime as the default low-level OCI runtime
+- name: remove /etc/crio/crio.conf.d/99-nvidia.conf
   file:
     path: /etc/crio/crio.conf.d/99-nvidia.conf
     state: absent
 
-- name: Restart crio
-  systemd_service:
-    name: crio
-
-- name: Uninstall nvidia-container-toolkit
+- name: uninstall nvidia-container-toolkit
   apt:
     name: "{{ packages }}"
     state: absent
   vars:
     packages:
     - nvidia-container-toolkit
-    - nvidia-container-toolkit-base
 
-- name: Remove libnvidia-container apt repository
-  apt_repository:
-    repo: |
-      deb [signed-by=/usr/share/keyrings/libnvidia-container-keyring.gpg]
-       https://nvidia.github.io/libnvidia-container/stable/deb/$(ARCH)/ /
-    filename: libnvidia-container
+- name: delete /etc/apt/sources.list.d/libnvidia-container-toolkit.list
+  file:
+    path: /etc/apt/sources.list.d/libnvidia-container-toolkit.list
     state: absent
 
-- name: Remove libnvidia-container public signing key
+- name: delete /usr/share/keyrings/libnvidia-container-keyring.gpg
   file:
     path: /usr/share/keyrings/libnvidia-container-keyring.gpg
     state: absent
 
+- name: delete /tmp/libnvidia-container-keyring.gpg
+  file:
+    path: /tmp/libnvidia-container-keyring.gpg
+    state: absent
