@@ -14,10 +14,18 @@
 
 - name: join cluster
   block:
-  - name: Run join command
+  - name: run join command
     shell: "{{ join_cmd.stdout_lines[0] }} --cri-socket={{ cri_socket }}"
     when:
     - k8s_node.resources == []
+    - "'gpus' not in group_names"
+
+  # some gpus still use cgroup v1 (delete this in the future)
+  - name: run join command and ignore system verification preflight errors
+    shell: "{{ join_cmd.stdout_lines[0] }} --cri-socket={{ cri_socket }} --ignore-preflight-errors=SystemVerification"
+    when:
+    - k8s_node.resources == []
+    - "'gpus' in group_names"
 
   - name: check if node has joined
     become: no
