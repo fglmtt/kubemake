@@ -26,6 +26,13 @@
     url: "https://download.opensuse.org/repositories/isv:/cri-o:/stable:/{{ crio_version }}/{{ crio_os }}/Release.key"
     dest: /tmp/crio-release.key
 
+# make sure /etc/apt/keyrings directory exists
+- name: ensure /etc/apt/keyrings directory exists
+  file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: '0755'
+
 # otherwide next task will prompt for confirmation
 - name: make sure cri-o repository key does not already exist
   file:
