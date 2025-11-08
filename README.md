@@ -122,7 +122,7 @@ crio_version="v1.28"
 crio_os=deb
 cri_socket="unix:/run/crio/crio.sock"
 cni_version="v1.4.0"
-kubernetes_version_repo="v1.29"
+kubernetes_version="v1.29"
 kubernetes_os="deb"
 kubernetes_version_pkg="1.29.9-1.1"
 
