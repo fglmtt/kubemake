@@ -13,11 +13,6 @@
     namespace: rabbitmq
     state: absent
 
-- name: Remove rabbitmq helm repository
-  kubernetes.core.helm_repository:
-    name: bitnami
-    state: absent
-
 - name: Delete rabbitmq namespace
   kubernetes.core.k8s:
     api_version: v1
