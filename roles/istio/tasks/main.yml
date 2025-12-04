@@ -35,19 +35,23 @@
     --skip-confirmation
 
 - name: configure istio-ingressgateway nodeport for http2
-  kubernetes.core.k8s_service:
-    state: present
+  kubernetes.core.k8s:
+    kind: Service
     name: istio-ingressgateway
     namespace: istio-system
-    inline:
-      spec:
-        ports:
-        - name: http2
-          port: 80
-          targetPort: 8080
-          protocol: TCP
-          nodePort: "{{ istio_ingress_http_port }}"
+    definition:
+      spec:w
         type: NodePort
+        ports:
+          - name: http2
+            port: 80
+            targetPort: 8080
+            nodePort: "{{ istio_ingress_http_port }}" 
+    state: patched
+  register: ingress_patch
+  retries: 5
+  delay: 10
+  until: ingress_patch is succeeded
 
 - name: generate istio manifest
   shell: >
