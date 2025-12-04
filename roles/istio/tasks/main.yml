@@ -40,7 +40,7 @@
     name: istio-ingressgateway
     namespace: istio-system
     definition:
-      spec:w
+      spec:
         type: NodePort
         ports:
           - name: http2
