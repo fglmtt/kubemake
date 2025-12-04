@@ -13,6 +13,15 @@
     namespace: rabbitmq
     state: absent
 
+- name: Delete rabbitmq crds
+  shell: |
+    CRDS=$(kubectl get crd -o name | grep rabbitmq || true)
+    if [ -n "$CRDS" ]; then
+      kubectl delete $CRDS --ignore-not-found
+    fi
+  register: result
+  changed_when: "'deleted' in result.stdout"
+
 - name: Delete rabbitmq namespace
   kubernetes.core.k8s:
     api_version: v1
