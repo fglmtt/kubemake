@@ -118,10 +118,11 @@ controller-1 ansible_user=ubuntu ansible_host=192.168.1.5
 
 [all:vars]
 ansible_ssh_private_key_file=/path/to/your/pem
-crio_version="1.28"
+crio_version="v1.28"
+crio_os=deb
 cri_socket="unix:/run/crio/crio.sock"
 cni_version="v1.4.0"
-kubernetes_version_repo="v1.29"
+kubernetes_version="v1.29"
 kubernetes_os="deb"
 kubernetes_version_pkg="1.29.9-1.1"
 
@@ -132,6 +133,7 @@ nvidia_device_plugin_version="v0.14.4"
 istio_version="1.20.2"
 istio_profile=demo
 istio_ingress_domain=yourdomain.edu
+istio_ingress_http_port=30830
 chaos_mesh_version="v2.6.1"
 fission_version="v1.20.5"
 
