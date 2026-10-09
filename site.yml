@@ -87,3 +87,20 @@
   - serverless
   roles:
   - fission/remote
+
+# runs only when explicitly requested, e.g., -t certs
+- hosts: masters
+  become: yes
+  tags:
+  - never
+  - certs
+  roles:
+  - k8s/certs
+
+- hosts: controllers
+  become: no
+  tags:
+  - never
+  - certs
+  roles:
+  - k8s/remote

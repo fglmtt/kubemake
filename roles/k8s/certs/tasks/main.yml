@@ -1,0 +1,93 @@
+---
+# https://kubernetes.io/docs/tasks/administer-cluster/kubeadm/kubeadm-certs/
+- name: check certificates expiration before renewal
+  shell: kubeadm certs check-expiration
+  register: certs_before
+  check_mode: false
+  changed_when: false
+
+- name: show certificates expiration before renewal
+  debug:
+    var: certs_before.stdout_lines
+
+- name: back up /etc/kubernetes
+  shell: tar czf /root/kubernetes-backup-{{ ansible_date_time.iso8601_basic_short }}.tgz -C /etc kubernetes
+
+- name: renew certificates
+  shell: kubeadm certs renew all
+
+# static pods are managed by the kubelet, which stops them when their manifests
+# are removed from /etc/kubernetes/manifests and starts them again when restored
+- name: restart control plane components
+  vars:
+    manifests_tmp_dir: /etc/kubernetes/manifests-tmp
+    control_plane_components:
+    - etcd
+    - kube-apiserver
+    - kube-controller-manager
+    - kube-scheduler
+  block:
+  - name: create temporary directory for static pod manifests
+    file:
+      path: "{{ manifests_tmp_dir }}"
+      state: directory
+      mode: "0700"
+
+  - name: move static pod manifests out of /etc/kubernetes/manifests
+    command: mv /etc/kubernetes/manifests/{{ item }}.yaml {{ manifests_tmp_dir }}/
+    loop: "{{ control_plane_components }}"
+
+  - name: wait for control plane containers to stop
+    shell: crictl ps -q --name '^({{ control_plane_components | join('|') }})$'
+    register: control_plane_containers
+    until: control_plane_containers.stdout == ""
+    retries: 30
+    delay: 3
+    changed_when: false
+
+  # always restore the manifests, otherwise a failure leaves the control plane down
+  always:
+  - name: move static pod manifests back to /etc/kubernetes/manifests
+    command: mv {{ manifests_tmp_dir }}/{{ item }}.yaml /etc/kubernetes/manifests/
+    args:
+      removes: "{{ manifests_tmp_dir }}/{{ item }}.yaml"
+    loop: "{{ control_plane_components }}"
+
+  - name: delete temporary directory for static pod manifests
+    file:
+      path: "{{ manifests_tmp_dir }}"
+      state: absent
+
+- name: wait for kube-apiserver to be ready
+  shell: kubectl --kubeconfig /etc/kubernetes/admin.conf get --raw=/readyz
+  register: apiserver_readyz
+  check_mode: false
+  until: apiserver_readyz.rc == 0
+  retries: 60
+  delay: 5
+  changed_when: false
+
+- name: wait for control plane pods to be ready
+  shell: kubectl --kubeconfig /etc/kubernetes/admin.conf -n kube-system wait --for=condition=Ready pod -l tier=control-plane --timeout=300s
+  changed_when: false
+  check_mode: false
+
+- name: copy /etc/kubernetes/admin.conf in ~/.kube
+  copy:
+    src: /etc/kubernetes/admin.conf
+    remote_src: yes
+    dest: /home/{{ ansible_user }}/.kube/config
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: "0600"
+    backup: yes
+
+- name: check certificates expiration after renewal
+  shell: kubeadm certs check-expiration
+  register: certs_after
+  check_mode: false
+  changed_when: false
+
+- name: show certificates expiration after renewal
+  debug:
+    var: certs_after.stdout_lines
