@@ -15,3 +15,7 @@
     create_namespace: yes
     chart_version: "{{ nvidia_device_plugin_version }}"
     update_repo_cache: yes
+    # run only on nodes labeled by k8s/join for the gpus group
+    values:
+      nodeSelector:
+        nvidia.com/gpu.present: "true"
