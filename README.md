@@ -169,6 +169,7 @@ If you are only interested in a subset of those components, you can use [Ansible
 - `telemetry`: deploys telemetry addons
 - `chaos`: deploys Chaos Mesh
 - `serverless`: deploys Fission
+- `certs`: renews the Kubernetes certificates (see [here](#certificate-renewal))
 
 For example, the command
 ```
@@ -180,6 +181,22 @@ Accodingly, to unmake
 ```
 $ ansible-playbook rollback-site.yml -i hosts -t setup,init,join,chaos
 ```
+
+### Certificate Renewal
+
+The certificates `kubeadm` generates expire after one year, while the certificate authorities last ten years. To check when they expire, SSH into the master and run:
+```
+$ sudo kubeadm certs check-expiration
+```
+
+To renew them, run:
+```
+$ ansible-playbook site.yml -i hosts -t certs
+```
+
+The `certs` tag never runs unless explicitly requested. It backs up `/etc/kubernetes` in `/root/kubernetes-backup-<timestamp>.tgz` on the master, renews the certificates, restarts the control plane, and updates the kubeconfig files on the master and controllers. While the control plane restarts, the Kubernetes API is unavailable for about a minute, whereas running workloads are not affected.
+
+Kubeconfig files copied elsewhere, e.g., on the control node, still contain the old certificate. Replace them with `~/.kube/config` from the master.
 
 ### Expected Result
 
